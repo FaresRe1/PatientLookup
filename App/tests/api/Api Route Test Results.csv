@@ -1,0 +1,42 @@
+Test,Route,Test Data,Expectation,Pass/Fail,Result
+,,,,,
+1,http://localhost/api/clients    [GET],N/A,"returns all clients with all fields, with 200 status code",Pass,"returns all clients with all fields, with 200 status code"
+2,http://localhost/api/clients    [POST],"fullName: ""Alice Johnson"", 
+email: ""alice@example.com"", 
+phoneNumber: ""9876543210"",
+address: ""456 Oak St"",
+notes: ""New client"",",creates a new client successfully with 200 status code,Pass,"creates a new client successfully,with 200 status code"
+3,http://localhost/api/clients    [POST],"email: ""alice@example.com""","Should not post any value, because Zod validation is not met.
+The satus code should be 400, with a validation failed message",Pass,"The values are not posted, the status code is 400,
+and a validation failed message is outputted"
+4,http://localhost/api/clients    [POST],"fullName: ""Charlie Brown"",
+email: ""existing@example.com"",
+phoneNumber: undefined,
+address: undefined,
+notes: undefined,","Should not post any value, because the email exists already. 
+The status code should be 400, and the error message should be
+Client email aready used",Pass,"The values are not posted, the status code is 400,
+and the error message is client email aready used"
+5,http://localhost:3000/api/clients/[id]    [GET],id:abc123,"It should return all of the data where the id:abc123, and status code 200",Pass,"The status code is 200, and data returned is 
+
+id: ""abc123"",
+fullName: ""John Doe"",
+email: ""john@example.com"",
+phoneNumber: ""1234567890"",
+address: ""123 Main St"",
+notes: ""None"",
+createdAt: now,
+updatedAt: now,
+
+
+"
+6,http://localhost:3000/api/clients/[id]    [GET],"id:""""","It should return status code 400 because Zod validation is not met, 
+and a error message",Pass,"The status code is 400, the error message is
+""Validation failed"""
+7,http://localhost:3000/api/clients/[id]    [GET],id:unknown,"It should return a status code 404 because the client id is not found,
+and the message should be Failed to find client information",Pass,"The status code is 404,
+the message outputted is Failed to find client information"
+8,http://localhost:3000/api/clients/search   [GET],http://localhost:3000/api/clients/search?query=john,"It should return only the clients that matches the query based on the
+fullName, email, or phoneNumber. The status code should be 200",Pass,"It returns the client that matches the query based on the
+fullName, email, or phoneNumber. The status code is 200"
+9,http://localhost:3000/api/clients/search   [GET],http://localhost:3000/api/clients/search?query=,It should return a full array because nothing matches an empty string,Pass,It returns a full array because nothing matches an empty string
