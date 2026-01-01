@@ -51,7 +51,7 @@ export default function AddClientPage() {
 
   return (
     <div>
-      <h1>Add New Client</h1>
+      <h1>Add New Patient</h1>
       <form onSubmit={handleSubmit}>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         {success && <p style={{ color: 'green' }}>{success}</p>}
@@ -100,12 +100,12 @@ export default function AddClientPage() {
             onChange={(e) => setNotes(e.target.value)}
           />
         </div>
-        <button type="submit">Add Client</button>
+        <button type="submit">Add Patient</button>
       </form>
       <br />
       <button>
-        <Link href="/">Back to Client List</Link>
+        <Link href="/">Back to Patient List</Link>
       </button>
-    </div>
+    </div> 
   );
 }

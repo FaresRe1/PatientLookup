@@ -9,7 +9,8 @@ type Client = {
   phoneNumber?: string;
   address?: string;
   notes?: string;
-};
+  
+}; 
 
 export default function Home() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -28,7 +29,7 @@ export default function Home() {
 
       try {
         const res = await fetch(url);
-        if (!res.ok) throw new Error("Failed to load clients.");
+        if (!res.ok) throw new Error("Failed to load patients.");
 
         const data = await res.json();
         const clientList = searchTerm.trim() ? data : data.clients;
@@ -47,23 +48,23 @@ export default function Home() {
 
   return (
     <main>
-      <h1>Client Management Application</h1>
+      <h1>Patient Management Application</h1>
       <div>
         <button>
-          <Link href="/add-client">Add New Client</Link>
+          <Link href="/add-client">Add New Patient</Link>
         </button>
 
         <div style={{ margin: '20px 0' }}>
           <input
             type="text"
-            placeholder="Search clients..."
+            placeholder="Search patients..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ padding: '8px', width: '300px', border: '1px solid #ccc' }}
           />
         </div>
 
-        <h2>Existing Clients</h2>
+        <h2>Existing Patients</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
         {clients.length > 0 ? (
           <ul>
@@ -77,7 +78,7 @@ export default function Home() {
             ))}
           </ul>
         ) : (
-          <p>No clients found.</p>
+          <p>No Patients found.</p>
         )}
       </div>
     </main>

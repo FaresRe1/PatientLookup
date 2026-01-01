@@ -3,29 +3,43 @@ import path from "path";
 import { existsSync } from "fs";
 
 const getDatabaseUrl = () => {
-  // If DATABASE_URL is explicitly set (by Electron), use it
+  // Check if we're running in Electron (process.type exists in Electron)
+  const isElectron = process.versions && process.versions.electron;
+  
+  // If DATABASE_URL is explicitly set (by Electron main process), use it
   if (process.env.DATABASE_URL && process.env.DATABASE_URL !== "file:./app.db") {
     console.log('[Prisma] Using explicit DATABASE_URL:', process.env.DATABASE_URL);
     return process.env.DATABASE_URL;
   }
 
-  // Development: use the .env value
-  if (process.env.NODE_ENV === "development") {
-    const devUrl = process.env.DATABASE_URL || "file:./prisma/app.db";
-    console.log('[Prisma] Using dev DATABASE_URL:', devUrl);
+  // For npm run dev (Next.js web development)
+  if (process.env.NODE_ENV === "development" && !isElectron) {
+    const dbPath = path.join(process.cwd(), 'prisma', 'app.db');
+    const devUrl = `file:${dbPath}`;
+    console.log('[Prisma] Using web dev DATABASE_URL:', devUrl);
     return devUrl;
   }
 
-  // Production: Check if we're in Electron by looking for app.db in current directory
+  // For npm run electron:dev (Electron development)
+  if (process.env.NODE_ENV === "development" && isElectron) {
+    const dbPath = path.join(process.cwd(), 'prisma', 'app.db');
+    const electronDevUrl = `file:${dbPath}`;
+    console.log('[Prisma] Using electron dev DATABASE_URL:', electronDevUrl);
+    return electronDevUrl;
+  }
+
+  // For npm dist (Production Electron .exe)
+  // In packaged Electron app, check for app.db in the app's directory
   const localDb = path.join(process.cwd(), 'app.db');
   if (existsSync(localDb)) {
-    console.log('[Prisma] Found database at:', localDb);
+    console.log('[Prisma] Found production database at:', localDb);
     return `file:${localDb}`;
   }
 
-  // Fallback to .env value
-  console.log('[Prisma] Using fallback DATABASE_URL:', process.env.DATABASE_URL);
-  return process.env.DATABASE_URL || "file:./prisma/app.db";
+  // Fallback: try prisma/app.db
+  const fallbackPath = path.join(process.cwd(), 'prisma', 'app.db');
+  console.log('[Prisma] Using fallback DATABASE_URL:', `file:${fallbackPath}`);
+  return `file:${fallbackPath}`;
 };
 
 const createPrismaClient = () => {
