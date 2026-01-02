@@ -5,11 +5,10 @@ import Link from "next/link";
 type Client = {
   id: string;
   fullName: string;
+  dob: string;
   email?: string;
   phoneNumber?: string;
   address?: string;
-  notes?: string;
-  
 }; 
 
 export default function Home() {
