@@ -3,16 +3,11 @@ import { z } from "zod";
 import { db } from "~/server/db";
 import { authWrapper } from "utils/authWrapper";
 import { parseBody } from "~/utils/validation";
+import { VisitCreate, VisitResponse } from "~/models/visit";
 
-const createVisitSchema = z.object({
-    clientId: z.string().min(1, "Client ID is required"),
-    doctorName: z.string().min(1, "Doctor name is required"),
-    notes: z.string().optional(),
-    visitDate: z.string().min(1, "Visit date is required"),
-});
+const createVisitSchema = VisitCreate;
 
 // GET: Fetch all visits for a specific client
-// Usage: /api/visits?clientId=123
 export const GET = authWrapper(async (req: NextRequest) => {
     try {
         const { searchParams } = new URL(req.url);
@@ -55,11 +50,12 @@ export const POST = authWrapper(async (req: NextRequest) => {
                 clientId: data.clientId,
                 doctorName: data.doctorName,
                 notes: data.notes || "",
-                visitDate: new Date(data.visitDate)
+                visitDate: data.visitDate instanceof Date ? data.visitDate : new Date(data.visitDate)
             }
         });
 
-        return NextResponse.json(newVisit, { status: 201 });
+        const validated = VisitResponse.parse(newVisit);
+        return NextResponse.json(validated, { status: 201 });
 
     } catch (error: any) {
         console.error("Create visit error:", error);

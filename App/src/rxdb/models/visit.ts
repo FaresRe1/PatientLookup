@@ -1,24 +1,17 @@
 import type { RxJsonSchema } from 'rxdb';
+import type { VisitResponseType } from '~/models/visit';
 
-export interface FormResponse {
-  templateId: string;   
+export type FormResponse = {
+  templateId: string;
   templateName: string;
-  answers: Record<string, any>; 
-}
+  answers: Record<string, any>;
+};
 
-export interface Visit {
-  id: string;
-  clientId: string; // (Foreign Key)
-  doctorName: string;    
-  visitDate: string;    
-  notes: string;        
-  
-
-  forms: FormResponse[]; 
-  
+export type Visit = Omit<VisitResponseType, 'visitDate' | 'createdAt'> & {
+  visitDate: string;
   createdAt: string;
-  updatedAt: string;
-}
+  forms?: FormResponse[];
+};
 
 export const visitSchema: RxJsonSchema<Visit> = {
   title: 'Visit/Report Schema',
@@ -33,7 +26,7 @@ export const visitSchema: RxJsonSchema<Visit> = {
     },
     doctorName: { type: 'string' },
     visitDate: { type: 'string', format: 'date-time' },
-    notes: { type: 'string' },
+    notes: { type: ['string', 'null'] },
     forms: {
       type: 'array',
       items: {
@@ -48,7 +41,6 @@ export const visitSchema: RxJsonSchema<Visit> = {
       }
     },
     createdAt: { type: 'string', format: 'date-time' },
-    updatedAt: { type: 'string', format: 'date-time' },
   },
   required: ['id', 'clientId', 'doctorName', 'visitDate', 'createdAt'],
   indexes: [

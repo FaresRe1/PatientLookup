@@ -55,6 +55,20 @@ async function main() {
   }
 
   console.log("Clients created.");
+
+  // Create a sample visit for the first client
+  const firstClient = await prisma.client.findFirst();
+  if (firstClient) {
+    await prisma.visit.create({
+      data: {
+        clientId: firstClient.id,
+        doctorName: "Dr Seed",
+        notes: "Initial seed visit",
+        visitDate: new Date(),
+      },
+    });
+    console.log("Sample visit created.");
+  }
 }
 
 main()
