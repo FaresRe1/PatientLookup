@@ -1,16 +1,9 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import type { ClientJSONType } from "~/models/client";
 
-type Client = {
-  id: string;
-  fullName: string;
-  gender: string;
-  dob: string;
-  email?: string;
-  phoneNumber?: string;
-  address?: string;
-}; 
+type Client = ClientJSONType;
 
 export default function Home() {
   const [clients, setClients] = useState<Client[]>([]);

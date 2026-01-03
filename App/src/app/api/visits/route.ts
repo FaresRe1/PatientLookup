@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "~/server/db";
 import { authWrapper } from "utils/authWrapper";
+import { parseBody } from "~/utils/validation";
 
 const createVisitSchema = z.object({
     clientId: z.string().min(1, "Client ID is required"),
@@ -41,9 +42,9 @@ export const POST = authWrapper(async (req: NextRequest) => {
     try {
         const body = await req.json();
 
-        const parsed = createVisitSchema.safeParse(body);
-        if (!parsed.success) {
-            return NextResponse.json({ msg: "Validation failed", errors: parsed.error.format() }, { status: 400 });
+        const parsed = parseBody(createVisitSchema, body);
+        if (!parsed.ok) {
+            return NextResponse.json({ msg: "Validation failed", errors: parsed.errors }, { status: 400 });
         }
 
         const data = parsed.data;

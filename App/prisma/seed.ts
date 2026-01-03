@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { ClientCreate } from "~/models/client";
 
 const prisma = new PrismaClient();
 
@@ -25,11 +26,13 @@ async function main() {
 
   console.log("Templates created.");
 
+
+
   const clientData = [
     {
       fullName: "User Fourth",
       gender: "Male",
-      dob: new Date("1980-01-01"),
+      dob: "1980-01-01",
       email: "user4@email.com",
       phoneNumber: "12345678910",
       address: "13 bold way",
@@ -37,7 +40,7 @@ async function main() {
     {
       fullName: "User Fifth",
       gender: "Female",
-      dob: new Date("1992-05-12"),
+      dob: "1992-05-12",
       email: "user5@email.com",
       phoneNumber: "10987654321",
       address: "15 bold way",
@@ -45,7 +48,10 @@ async function main() {
   ];
 
   for (const u of clientData) {
-    await prisma.client.create({ data: u });
+    // validate shape with central schema before writing to DB
+    const parsed = ClientCreate.parse(u);
+    const dobVal = parsed.dob instanceof Date ? parsed.dob : new Date(parsed.dob as any);
+    await prisma.client.create({ data: { ...parsed, dob: dobVal } });
   }
 
   console.log("Clients created.");

@@ -1,27 +1,24 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { authWrapper } from "utils/authWrapper";
-import { z } from "zod";
 import { db } from "~/server/db";
+import { ClientCreate, ClientResponse } from "~/models/client";
+import { parseBody } from "~/utils/validation";
 
-const clientSchema = z.object({
-    fullName: z.string().min(1, "Full name is required"),
-    dob: z.string().min(1, "Date of Birth is required"),
-    gender: z.string().min(1, "Gender is required"),
-    email: z.string().email("Invalid email address").optional().nullable().or(z.literal('')),
-    phoneNumber: z.string().optional().nullable(),
-    address: z.string().optional().nullable(),
-});
     
 //This get request gets ALL of the clients from the client database. Minimum 50, if the database includes more than 50, then only the first 50 will be shown by order of fullName
 // To run use this GET request: http://localhost:3000/api/clients
 export const GET = authWrapper(async (req: Request) => {
     try {
-        const clients = await db.client.findMany({ 
+        const rows = await db.client.findMany({ 
             take: 50, 
             skip: 0, 
             orderBy: { fullName: 'asc' }, 
         });
+
+        // Validate/normalize rows using ClientResponse
+        const clients = rows.map((r) => ClientResponse.parse(r));
+
         return NextResponse.json({ clients });
     }
     catch (error: any) {
@@ -34,13 +31,13 @@ export const GET = authWrapper(async (req: Request) => {
 export const POST = authWrapper(async (req: Request) => {
     try {
         const body = await req.json()
-        const parsed = clientSchema.safeParse(body);
-        
-        if (!parsed.success) {
-            return NextResponse.json({ msg: "Validation failed" }, { status: 400 });
+
+        const result = parseBody(ClientCreate, body);
+        if (!result.ok) {
+            return NextResponse.json({ msg: "Validation failed", errors: result.errors }, { status: 400 });
         }
-        
-        const { fullName, email, phoneNumber, address, dob, gender } = parsed.data;
+
+        const { fullName, email, phoneNumber, address, dob, gender } = result.data;
 
         const newClient = await db.client.create({
             data: {
@@ -54,7 +51,9 @@ export const POST = authWrapper(async (req: Request) => {
             }
         });
         
-        return NextResponse.json({ newClient });
+        // Validate the created client before returning
+        const validated = ClientResponse.parse(newClient);
+        return NextResponse.json({ newClient: validated });
     }
     catch (error: any) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {

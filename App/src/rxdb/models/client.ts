@@ -1,18 +1,14 @@
 import type { RxJsonSchema } from 'rxdb';
+import type { ClientResponseType } from '~/models/client';
 
-export interface Client {
-  id: string;
-  fullName: string;
-  gender: string;
-  dob: string;
-  email?: string | null;
-  phoneNumber?: string | null;
-  address?: string | null;
+// RxDB stores date-like fields as ISO strings in JSON; reuse central model types
+export type Client = Omit<ClientResponseType, 'dob' | 'createdAt' | 'updatedAt' | 'lastModified'> & {
+  dob: string | null;
   createdAt: string;
   updatedAt: string;
+  lastModified?: string | null;
   deletedAt?: string | null;
-  revision: number;
-}
+};
 
 export const clientSchema: RxJsonSchema<Client> = {
   title: 'Client schema',
@@ -29,6 +25,7 @@ export const clientSchema: RxJsonSchema<Client> = {
     address: { type: ['string', 'null'] },
     createdAt: { type: 'string', format: 'date-time' },
     updatedAt: { type: 'string', format: 'date-time' },
+    lastModified: { type: ['string', 'null'], format: 'date-time' },
     deletedAt: { type: ['string', 'null'], format: 'date-time' },
     revision: { type: 'integer' },
   },

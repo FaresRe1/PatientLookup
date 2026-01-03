@@ -6,17 +6,9 @@ import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
 
-type Client = {
-    id: string;
-    fullName: string;
-    gender: string;
-    dob: string; 
-    email?: string | null;
-    phoneNumber?: string | null;
-    address?: string | null;
-    createdAt: string;
-    updatedAt: string;
-};
+import type { ClientJSONType } from "~/models/client";
+
+type Client = ClientJSONType; 
 
 type Visit = {
     id: string;

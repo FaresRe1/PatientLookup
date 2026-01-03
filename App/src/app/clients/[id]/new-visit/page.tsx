@@ -4,12 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-type Client = {
-  id: string;
-  fullName: string;
-  gender: string;
-  dob: string;
-};
+import type { ClientJSONType } from "~/models/client";
+
+type Client = Pick<ClientJSONType, 'id' | 'fullName' | 'gender' | 'dob'>;
+
 
 export default function NewVisitPage() {
   const params = useParams();
@@ -40,7 +38,7 @@ export default function NewVisitPage() {
     if (id) fetchClient();
   }, [id]);
 
-  const getAge = (dobString: string | null) => {
+  const getAge = (dobString?: string | null) => {
     if (!dobString) return "N/A";
     const dob = new Date(dobString);
     const diff_ms = Date.now() - dob.getTime();
