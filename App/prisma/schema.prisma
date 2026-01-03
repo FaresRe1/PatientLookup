@@ -13,11 +13,11 @@ model Client {
   updatedAt    DateTime  @updatedAt
   
   fullName     String
-  dob          DateTime?
+  gender       String
+  dob          DateTime
   email        String?   @unique
   phoneNumber  String?
   address      String?
-  // Removed 'notes' from here as requested
   
   deletedAt    DateTime?
   lastModified DateTime  @default(now())

@@ -7,7 +7,8 @@ import Link from "next/link";
 type Client = {
   id: string;
   fullName: string;
-  dob: string | null;
+  gender: string;
+  dob: string;
 };
 
 export default function NewVisitPage() {
@@ -62,6 +63,7 @@ export default function NewVisitPage() {
           clientId: id,
           doctorName: doctorName,
           notes: notes,
+          visitDate: visitDate,
         }),
       });
 
@@ -90,7 +92,7 @@ export default function NewVisitPage() {
       {/* --- HEADER --- */}
       <h1>New Visit</h1>
       <p>
-        <strong>Patient:</strong> {client.fullName} ({getAge(client.dob)} y/o)
+        <strong>Patient:</strong> {client.fullName} ({client.gender}, {getAge(client.dob)} y/o)
       </p>
       
       <hr />

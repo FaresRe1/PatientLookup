@@ -3,6 +3,7 @@ import type { RxJsonSchema } from 'rxdb';
 export interface Client {
   id: string;
   fullName: string;
+  gender: string;
   dob: string;
   email?: string | null;
   phoneNumber?: string | null;
@@ -21,6 +22,7 @@ export const clientSchema: RxJsonSchema<Client> = {
   properties: {
     id: { type: 'string' },
     fullName: { type: 'string' },
+    gender: { type: 'string' },
     dob: { type: 'string', format: 'date-time' },
     email: { type: ['string', 'null'] },
     phoneNumber: { type: ['string', 'null'] },
@@ -30,6 +32,6 @@ export const clientSchema: RxJsonSchema<Client> = {
     deletedAt: { type: ['string', 'null'], format: 'date-time' },
     revision: { type: 'integer' },
   },
-  required: ['id', 'fullName', 'createdAt', 'updatedAt', 'revision'],
+  required: ['id', 'fullName', 'gender', 'dob', 'createdAt', 'updatedAt', 'revision'],
   indexes: ['fullName', 'updatedAt'],
 };

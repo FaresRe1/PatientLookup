@@ -5,6 +5,7 @@ import Link from "next/link";
 
 export default function AddClientPage() {
   const [fullName, setFullName] = useState("");
+  const [gender, setGender] = useState("");
   const [dob, setDob] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -29,7 +30,7 @@ export default function AddClientPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fullName, dob, email, phoneNumber, address }),
+        body: JSON.stringify({ fullName, gender, dob, email, phoneNumber, address }),
       });
 
       if (!response.ok) {
@@ -39,6 +40,7 @@ export default function AddClientPage() {
 
       setSuccess("Client added successfully!");
       setFullName("");
+      setGender("")
       setDob("");
       setEmail("");
       setPhoneNumber("");
@@ -66,7 +68,21 @@ export default function AddClientPage() {
           />
         </div>
         <div>
-          <label htmlFor="dob">Date of Birth:</label>
+          <label htmlFor="gender">Gender (Required):</label>
+          <select
+            id="gender"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            required
+            style={{ padding: '5px', margin: '5px 0' }}
+          >
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="dob">Date of Birth (Required):</label>
           <input
             id="dob"
             type="date"

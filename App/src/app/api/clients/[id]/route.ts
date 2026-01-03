@@ -7,6 +7,7 @@ const idSchema = z.string().min(1, "id is required");
 
 const updateClientSchema = z.object({
     fullName: z.string().min(1, "Name is required").optional(),
+    gender: z.string().min(1).optional(),
     email: z.string().email("Invalid email").optional().nullable(),
     phoneNumber: z.string().optional().nullable(),
     address: z.string().optional().nullable(),

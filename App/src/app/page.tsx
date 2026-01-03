@@ -5,6 +5,7 @@ import Link from "next/link";
 type Client = {
   id: string;
   fullName: string;
+  gender: string;
   dob: string;
   email?: string;
   phoneNumber?: string;

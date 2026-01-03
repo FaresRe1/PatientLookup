@@ -3,13 +3,11 @@ import { z } from "zod";
 import { db } from "~/server/db";
 import { authWrapper } from "utils/authWrapper";
 
-// Schema for creating a new visit
-// We validate that the clientId exists and basic notes are strings
 const createVisitSchema = z.object({
     clientId: z.string().min(1, "Client ID is required"),
     doctorName: z.string().min(1, "Doctor name is required"),
     notes: z.string().optional(),
-    // We will expand this schema later when we add the dynamic forms
+    visitDate: z.string().min(1, "Visit date is required"),
 });
 
 // GET: Fetch all visits for a specific client
@@ -27,7 +25,7 @@ export const GET = authWrapper(async (req: NextRequest) => {
             where: { clientId },
             orderBy: { visitDate: 'desc' }, // Show newest visits first
             include: {
-                forms: true // Also grab the questionnaires attached to this visit
+                forms: true // Also grab the documents attached to this visit
             }
         });
 
@@ -56,7 +54,7 @@ export const POST = authWrapper(async (req: NextRequest) => {
                 clientId: data.clientId,
                 doctorName: data.doctorName,
                 notes: data.notes || "",
-                visitDate: new Date(), // Defaults to now
+                visitDate: new Date(data.visitDate)
             }
         });
 

@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic';
 type Client = {
     id: string;
     fullName: string;
+    gender: string;
     dob: string; 
     email?: string | null;
     phoneNumber?: string | null;
@@ -70,7 +71,7 @@ export default function ClientDetails() {
         fetchData();
     }, [id]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
@@ -139,7 +140,18 @@ export default function ClientDetails() {
                         <span>{client.fullName}</span>
                     )}
                 </div>
-
+                <div style={{ marginBottom: '10px' }}>
+                    <strong>Gender: </strong>
+                    {isEditing ? (
+                        <select name="gender" value={formData.gender || ""} onChange={handleInputChange} style={{ padding: '5px' }}>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    ) : (
+                        <span>{client.gender}</span>
+                    )}
+                </div>
                 <div style={{ marginBottom: '10px' }}>
                     <strong>DOB: </strong>
                     {isEditing ? (

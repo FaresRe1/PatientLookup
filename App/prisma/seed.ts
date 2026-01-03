@@ -28,6 +28,7 @@ async function main() {
   const clientData = [
     {
       fullName: "User Fourth",
+      gender: "Male",
       dob: new Date("1980-01-01"),
       email: "user4@email.com",
       phoneNumber: "12345678910",
@@ -35,6 +36,7 @@ async function main() {
     },
     {
       fullName: "User Fifth",
+      gender: "Female",
       dob: new Date("1992-05-12"),
       email: "user5@email.com",
       phoneNumber: "10987654321",
