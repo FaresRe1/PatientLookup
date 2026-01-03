@@ -34,7 +34,6 @@ export default function ClientDetails() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Edit Mode State
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState<Partial<Client>>({});
     const [isSaving, setIsSaving] = useState(false);
@@ -44,7 +43,6 @@ export default function ClientDetails() {
             setIsLoading(true);
             setError(null);
             try {
-                // Fetch Client
                 const res = await fetch(`/api/clients/${id}`);
                 if (!res.ok) throw new Error("Failed to load client.");
                 const data = await res.json();
@@ -199,7 +197,7 @@ export default function ClientDetails() {
                                 <p><strong>Date:</strong> {new Date(visit.visitDate).toLocaleDateString()}</p>
                                 <p><strong>Doctor:</strong> {visit.doctorName}</p>
                                 <p><strong>Notes:</strong> {visit.notes}</p>
-                                <Link href={`/visits/${visit.id}`}>View Full Report</Link>
+                                {/* TODO: Add documents*/}
                             </li>
                         ))}
                     </ul>
