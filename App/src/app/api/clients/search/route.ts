@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "~/server/db";
-import { authWrapper } from "utils/authWrapper";
+import { authWrapper } from "~/utils/authWrapper";
 
 import { ClientResponse } from "~/models/client";
 

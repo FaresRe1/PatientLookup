@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { authWrapper } from "utils/authWrapper";
+import { authWrapper } from "~/utils/authWrapper";
 import { db } from "~/server/db";
 import { ClientCreate, ClientResponse } from "~/models/client";
 import { parseBody } from "~/utils/validation";
