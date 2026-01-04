@@ -20,6 +20,8 @@ vi.mock("~/server/db", () => ({
 
 const mockedDb = vi.mocked(db, true);
 
+import { makeClientRecord, clientRecordToJson } from "../factories/clientFactory";
+
 // Reset mocks before each test to avoid leaking data between tests
 beforeEach(() => {
     mockedDb.client.findMany.mockReset();
@@ -33,57 +35,19 @@ describe("Clients API - GET", () => {
     it("returns up to 50 clients with all fields", async () => {
         const now = new Date();
 
-        // Mock db response
-        mockedDb.client.findMany.mockResolvedValue([
-            {
-                id: "ckx123abc",
-                createdAt: now,
-                updatedAt: now,
-                fullName: "John Doe",
-                email: "john@example.com",
-                phoneNumber: "1234567890",
-                address: "123 Main St",
-                notes: "VIP client",
-            },
-            {
-                id: "ckx456def",
-                createdAt: now,
-                updatedAt: now,
-                fullName: "Jane Smith",
-                email: null,
-                phoneNumber: null,
-                address: null,
-                notes: null,
-            },
-        ]);
+        const a = makeClientRecord({ id: "ckx123abc", fullName: "John Doe", email: "john@example.com", phoneNumber: "1234567890", address: "123 Main St", createdAt: now, updatedAt: now });
+        const b = makeClientRecord({ id: "ckx456def", fullName: "Jane Smith", email: null, phoneNumber: null, address: null, createdAt: now, updatedAt: now });
 
-        // Call GET handler, and recieves the exact result I mocked. As well as the requirement of take 50, skip 0 and order by.
+        mockedDb.client.findMany.mockResolvedValue([a, b]);
+
+        // Call GET handler
         const response = await GET(new Request("http://localhost/api/clients"));
         const json = await response.json();
 
         expect(response.status).toBe(200);
 
-        expect(json.clients[0]).toEqual({
-            id: "ckx123abc",
-            createdAt: now.toISOString(),
-            updatedAt: now.toISOString(),
-            fullName: "John Doe",
-            email: "john@example.com",
-            phoneNumber: "1234567890",
-            address: "123 Main St",
-            notes: "VIP client",
-        });
-
-        expect(json.clients[1]).toEqual({
-            id: "ckx456def",
-            createdAt: now.toISOString(),
-            updatedAt: now.toISOString(),
-            fullName: "Jane Smith",
-            email: null,
-            phoneNumber: null,
-            address: null,
-            notes: null,
-        });
+        expect(json.clients[0]).toEqual(clientRecordToJson(a));
+        expect(json.clients[1]).toEqual(clientRecordToJson(b));
 
         expect(mockedDb.client.findMany).toHaveBeenCalledWith({
             take: 50,
@@ -101,22 +65,15 @@ describe("Clients API - POST", () => {
         const now = new Date();
         const clientData = {
             fullName: "Alice Johnson",
+            gender: "female",
+            dob: now.toISOString(),
             email: "alice@example.com",
             phoneNumber: "9876543210",
             address: "456 Oak St",
-            notes: "New client",
         };
 
-        mockedDb.client.create.mockResolvedValue({
-            id: "ckx789ghi",
-            createdAt: now,
-            updatedAt: now,
-            fullName: "Alice Johnson",
-            email: "alice@example.com",
-            phoneNumber: "9876543210",
-            address: "456 Oak St",
-            notes: "New client",
-        });
+        const created = makeClientRecord({ id: "ckx789ghi", fullName: "Alice Johnson", email: "alice@example.com", phoneNumber: "9876543210", address: "456 Oak St", gender: "female", dob: now, createdAt: now, updatedAt: now });
+        mockedDb.client.create.mockResolvedValue(created);
 
         const response = await POST(
             new Request("http://localhost/api/clients", {
@@ -128,19 +85,17 @@ describe("Clients API - POST", () => {
 
         // This is the expected result for a valid post request
         expect(response.status).toBe(200);
-        expect(json.newClient).toEqual({
-            id: "ckx789ghi",
-            createdAt: now.toISOString(),
-            updatedAt: now.toISOString(),
-            fullName: "Alice Johnson",
-            email: "alice@example.com",
-            phoneNumber: "9876543210",
-            address: "456 Oak St",
-            notes: "New client",
-        });
+        expect(json.newClient).toEqual(clientRecordToJson(created));
 
         expect(mockedDb.client.create).toHaveBeenCalledWith({
-            data: clientData,
+            data: {
+                fullName: clientData.fullName,
+                gender: clientData.gender,
+                dob: expect.any(Date),
+                email: clientData.email,
+                phoneNumber: clientData.phoneNumber,
+                address: clientData.address,
+            },
         });
     });
 
@@ -155,20 +110,22 @@ describe("Clients API - POST", () => {
         );
         const json = await response.json();
 
-        // This is expected because fullName is required. Its a validation error because Zod expects a fullName
+        // This is expected because required fields (fullName, gender, dob) are missing
         expect(response.status).toBe(400);
         expect(json.msg).toBe("Validation failed");
         expect(mockedDb.client.create).not.toHaveBeenCalled();
     });
 
     it("handles unique email constraint (P2002)", async () => {
-        // Here undefined is also equal to empty "" because those data are optional
+        // Include required fields so validation passes then prisma throws unique constraint
+        const now = new Date();
         const clientData = {
             fullName: "Charlie Brown",
+            gender: "male",
+            dob: now.toISOString(),
             email: "existing@example.com",
             phoneNumber: undefined,
             address: undefined,
-            notes: undefined,
         };
 
         // Mock P2002 error

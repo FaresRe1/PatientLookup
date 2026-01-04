@@ -56,12 +56,9 @@ export const POST = authWrapper(async (req: Request) => {
         return NextResponse.json({ newClient: validated });
     }
     catch (error: any) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            // Unique constraint violation (e.g. email already exists)
-            if (error.code === "P2002") {
-                return NextResponse.json({ msg: 'Client email already used', error: error.message }, { status: 400 });
-            }
+        if (error && (error.code === "P2002" || (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002"))) {
+            return NextResponse.json({ msg: 'Client email already used', error: error.message }, { status: 400 });
         }
-        return NextResponse.json({ msg: 'Failed to post client information', error: error.message }, { status: 500 });
+        return NextResponse.json({ msg: 'Failed to post client information', error: error?.message }, { status: 500 });
     }
 });
