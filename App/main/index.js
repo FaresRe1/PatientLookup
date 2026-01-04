@@ -65,7 +65,7 @@ async function createWindow() {
         await mainWindow.loadURL('http://localhost:3000');
         mainWindow.webContents.openDevTools();
     }
-    else { 
+    else {
         console.log('=== Production Mode ===');
         // Setup database
         const { dbPath, userDataPath } = setupDatabase();

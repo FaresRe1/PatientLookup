@@ -5,10 +5,11 @@ import Link from "next/link";
 
 export default function AddClientPage() {
   const [fullName, setFullName] = useState("");
+  const [gender, setGender] = useState("");
+  const [dob, setDob] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
-  const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -29,7 +30,7 @@ export default function AddClientPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fullName, email, phoneNumber, address, notes }),
+        body: JSON.stringify({ fullName, gender, dob, email, phoneNumber, address }),
       });
 
       if (!response.ok) {
@@ -39,10 +40,11 @@ export default function AddClientPage() {
 
       setSuccess("Client added successfully!");
       setFullName("");
+      setGender("")
+      setDob("");
       setEmail("");
       setPhoneNumber("");
       setAddress("");
-      setNotes("");
       router.push("/");
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
@@ -62,6 +64,30 @@ export default function AddClientPage() {
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="gender">Gender (Required):</label>
+          <select
+            id="gender"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            required
+            style={{ padding: '5px', margin: '5px 0' }}
+          >
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="dob">Date of Birth (Required):</label>
+          <input
+            id="dob"
+            type="date"
+            value={dob}
+            onChange={(e) => setDob(e.target.value)}
             required
           />
         </div>
@@ -90,14 +116,6 @@ export default function AddClientPage() {
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="notes">Notes:</label>
-          <textarea
-            id="notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
           />
         </div>
         <button type="submit">Add Patient</button>

@@ -16,27 +16,21 @@ vi.mock("~/server/db", () => ({
 
 const mockedDb = vi.mocked(db, true);
 
+import { makeClientRecord, clientRecordToJson } from "../factories/clientFactory";
+import { NextRequest } from "next/server";
+
 describe("Clients API - GET /api/clients/[id]", () => {
     it("returns client details when found", async () => {
         const now = new Date();
 
         // This is the mocked data from the database
-        const mockClient = {
-            id: "abc123",
-            fullName: "John Doe",
-            email: "john@example.com",
-            phoneNumber: "1234567890",
-            address: "123 Main St",
-            notes: "VIP client",
-            createdAt: now,
-            updatedAt: now,
-        };
+        const mockClient = makeClientRecord({ id: "abc123", fullName: "John Doe", email: "john@example.com", phoneNumber: "1234567890", address: "123 Main St", createdAt: now, updatedAt: now });
 
         mockedDb.client.findUnique.mockResolvedValue(mockClient);
 
         // The id matches what is in the mocked client
         const response = await GET(
-            new Request("http://localhost:3000/api/clients/abc123"),
+            new NextRequest("http://localhost:3000/api/clients/abc123"),
             { params: Promise.resolve({ id: "abc123" }) }
         );
 
@@ -44,11 +38,7 @@ describe("Clients API - GET /api/clients/[id]", () => {
 
         // The result will be the data that I mocked, with the correct status code
         expect(response.status).toBe(200);
-        expect(json.details).toEqual({
-            ...mockClient,
-            createdAt: mockClient.createdAt.toISOString(),
-            updatedAt: mockClient.updatedAt.toISOString(),
-        });
+        expect(json.details).toEqual(clientRecordToJson(mockClient));
 
         // This is how prisma finds the client from the db
         expect(mockedDb.client.findUnique).toHaveBeenCalledWith({
@@ -58,7 +48,7 @@ describe("Clients API - GET /api/clients/[id]", () => {
 
     it("returns 400 if id validation fails", async () => {
         const response = await GET(
-            new Request("http://localhost:3000/api/clients/"),
+            new NextRequest("http://localhost:3000/api/clients/"),
             { params: Promise.resolve({ id: "" }) }
         );
 
@@ -72,7 +62,7 @@ describe("Clients API - GET /api/clients/[id]", () => {
         mockedDb.client.findUnique.mockResolvedValue(null);
 
         const response = await GET(
-            new Request("http://localhost:3000/api/clients/unknown"),
+            new NextRequest("http://localhost:3000/api/clients/unknown"),
             { params: Promise.resolve({ id: "unknown" }) }
         );
 

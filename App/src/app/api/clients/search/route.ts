@@ -1,21 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "~/server/db";
-import { authWrapper } from "utils/authWrapper";
+import { authWrapper } from "~/utils/authWrapper";
 
-// Define Client type
-type Client = {
-    id: string;
-    fullName: string;
-    email?: string | null;
-    phoneNumber?: string | null;
-    address?: string | null;
-    notes?: string | null;
-};
+import { ClientResponse } from "~/models/client";
 
 const searchSchema = z.object({
     query: z.string().optional(),
 });
+
 
 // To run use this GET request : http://localhost:3000/api/clients/search?query=whatever_you_want_to_type
 // export const GET = authWrapper(async (req: Request) => {  ONLY USE THIS WHEN TESTING
@@ -31,20 +24,19 @@ export const GET = authWrapper(async (req: NextRequest) => {
 
         const { query } = parseResult.data;
 
-        let clients: Client[];
+        // Build a case-insensitive contains query against fullName, email, or phoneNumber
+        const q = query ?? "";
+        const where = {
+            OR: [
+                { fullName: { contains: q } },
+                { email: { contains: q } },
+                { phoneNumber: { contains: q } },
+            ],
+        };
 
-        if (!query) {
-            // Empty query return all clients
-            clients = await db.client.findMany();
-        } else {
-            // Non-empty query for case-insensitive search using raw SQL
-            clients = await db.$queryRaw<Client[]>`
-                SELECT * FROM Client
-                WHERE LOWER(fullName) LIKE '%' || LOWER(${query}) || '%'
-                   OR LOWER(email) LIKE '%' || LOWER(${query}) || '%'
-                   OR LOWER(phoneNumber) LIKE '%' || LOWER(${query}) || '%';
-            `;
-        }
+        const rows = await db.client.findMany({ where });
+
+        const clients = rows.map((r) => ClientResponse.parse(r));
 
         return NextResponse.json(clients);
     } catch (error: any) {

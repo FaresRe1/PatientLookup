@@ -22,6 +22,7 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "test": "vitest",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "build:electron": "tsc --project tsconfig.electron.json",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && npm run build:electron && electron .\"",

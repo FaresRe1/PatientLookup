@@ -1,28 +1,81 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+import { ClientCreate } from "~/models/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-const clientData: Prisma.ClientCreateInput[] = [
+async function main() {
+  const malariaTemplate = await prisma.template.create({
+    data: {
+      name: "Malaria Rapid Test",
+      structure: JSON.stringify([
+        { id: "q1", type: "yes_no", label: "Patient has fever > 38C?" },
+        { id: "q2", type: "text", label: "RDT Result (Pos/Neg)" },
+      ]),
+    },
+  });
+
+  const generalCheckupTemplate = await prisma.template.create({
+    data: {
+      name: "General Health Check",
+      structure: JSON.stringify([
+        { id: "q1", type: "text", label: "Chief Complaint" },
+        { id: "q2", type: "yes_no", label: "Is patient taking medication?" },
+      ]),
+    },
+  });
+
+  console.log("Templates created.");
+
+
+
+  const clientData = [
     {
-        fullName: "User Fourth",
-        email: "user4@email.com",
-        phoneNumber: "12345678910",
-        address: "13 bold way",
-        notes: "Hello my name is bob"
+      fullName: "User Fourth",
+      gender: "Male",
+      dob: "1980-01-01",
+      email: "user4@email.com",
+      phoneNumber: "12345678910",
+      address: "13 bold way",
     },
     {
-        fullName: "User Fifth",
-        email: "user5@email.com",
-        phoneNumber: "10987654321",
-        address: "15 bold way",
-        notes: "Hello my name is jo"
-    }
-]
+      fullName: "User Fifth",
+      gender: "Female",
+      dob: "1992-05-12",
+      email: "user5@email.com",
+      phoneNumber: "10987654321",
+      address: "15 bold way",
+    },
+  ];
 
-export async function main() {
-    for (const u of clientData) {
-        await prisma.client.create({ data: u });
-    }
+  for (const u of clientData) {
+    // validate shape with central schema before writing to DB
+    const parsed = ClientCreate.parse(u);
+    const dobVal = parsed.dob instanceof Date ? parsed.dob : new Date(parsed.dob as any);
+    await prisma.client.create({ data: { ...parsed, dob: dobVal } });
+  }
+
+  console.log("Clients created.");
+
+  // Create a sample visit for the first client
+  const firstClient = await prisma.client.findFirst();
+  if (firstClient) {
+    await prisma.visit.create({
+      data: {
+        clientId: firstClient.id,
+        doctorName: "Dr Seed",
+        notes: "Initial seed visit",
+        visitDate: new Date(),
+      },
+    });
+    console.log("Sample visit created.");
+  }
 }
 
-main();
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
