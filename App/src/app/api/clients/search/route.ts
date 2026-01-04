@@ -24,18 +24,17 @@ export const GET = authWrapper(async (req: NextRequest) => {
 
         const { query } = parseResult.data;
 
-        let rows: any[];
+        // Build a case-insensitive contains query against fullName, email, or phoneNumber
+        const q = query ?? "";
+        const where = {
+            OR: [
+                { fullName: { contains: q } },
+                { email: { contains: q } },
+                { phoneNumber: { contains: q } },
+            ],
+        };
 
-        if (!query) {
-            rows = await db.client.findMany();
-        } else {
-            rows = await db.$queryRaw`
-                SELECT * FROM Client
-                WHERE LOWER(fullName) LIKE '%' || LOWER(${query}) || '%'
-                   OR LOWER(email) LIKE '%' || LOWER(${query}) || '%'
-                   OR LOWER(phoneNumber) LIKE '%' || LOWER(${query}) || '%';
-            `;
-        }
+        const rows = await db.client.findMany({ where });
 
         const clients = rows.map((r) => ClientResponse.parse(r));
 
