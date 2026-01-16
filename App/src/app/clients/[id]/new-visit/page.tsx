@@ -5,9 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import type { ClientJSONType } from "~/models/client";
+import type { AttachmentType } from "~/models/attachment";
 
 type Client = Pick<ClientJSONType, 'id' | 'fullName' | 'gender' | 'dob'>;
-
 
 export default function NewVisitPage() {
   const params = useParams();
@@ -21,6 +21,11 @@ export default function NewVisitPage() {
   const [visitDate, setVisitDate] = useState(new Date().toISOString().split('T')[0]); 
   const [doctorName, setDoctorName] = useState("");
   const [notes, setNotes] = useState("");
+  
+  const [visitId, setVisitId] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<AttachmentType[]>([]);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [visitSavedMessage, setVisitSavedMessage] = useState(false);
   
   useEffect(() => {
     const fetchClient = async () => {
@@ -46,6 +51,70 @@ export default function NewVisitPage() {
     return Math.abs(age_dt.getUTCFullYear() - 1970);
   };
 
+  const handleFileUpload = async (file: File) => {
+    if (!visitId) {
+      alert("Please save the visit first before uploading files");
+      return;
+    }
+
+    setIsUploadingFile(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("visitId", visitId);
+
+      const res = await fetch("/api/attachments", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Failed to upload file");
+
+      const newAttachment = await res.json();
+      setAttachments([newAttachment, ...attachments]);
+    } catch (err: any) {
+      alert(err.message || "Failed to upload file");
+    } finally {
+      setIsUploadingFile(false);
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    if (!confirm("Delete this attachment?")) return;
+
+    try {
+      const res = await fetch(`/api/attachments/${attachmentId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Failed to delete attachment");
+
+      setAttachments(attachments.filter(a => a.id !== attachmentId));
+    } catch (err: any) {
+      alert(err.message || "Failed to delete attachment");
+    }
+  };
+
+  const fetchAttachments = async () => {
+    if (!visitId) return;
+    try {
+      const res = await fetch(`/api/attachments?visitId=${visitId}`);
+      if (!res.ok) throw new Error("Failed to load attachments");
+      const data = await res.json();
+      setAttachments(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
+  };
+
   const handleSave = async () => {
     if (!doctorName) {
       alert("Please enter who saw the patient.");
@@ -67,9 +136,13 @@ export default function NewVisitPage() {
 
       if (!res.ok) throw new Error("Failed to save visit");
 
-      router.push(`/clients/${id}`);
+      const savedVisit = await res.json();
+      setVisitId(savedVisit.id);
+      setAttachments([]);
+      setVisitSavedMessage(true);
     } catch (err: any) {
       alert(err.message);
+    } finally {
       setIsSaving(false);
     }
   };
@@ -128,18 +201,66 @@ export default function NewVisitPage() {
 
       <div style={{ margin: "20px 0" }}>
         <p><strong>Documents:</strong></p>
-        <p>(No documents attached)</p>
         <button onClick={() => alert("Template feature coming soon")}>
-            Add Document
+          Add from Template
         </button>
+        <p>
+          <input 
+            type="file" 
+            accept="image/*,.png,.jpg,.jpeg"
+            onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+            disabled={isUploadingFile || !visitId}
+            style={{ marginRight: "10px" }}
+          />
+          <span style={{ fontSize: "14px", color: "#666" }}>Add Image</span>
+        </p>
+        <p>
+          <input 
+            type="file" 
+            accept=".pdf,.doc,.docx,.xlsx,.xls"
+            onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+            disabled={isUploadingFile || !visitId}
+            style={{ marginRight: "10px" }}
+          />
+          <span style={{ fontSize: "14px", color: "#666" }}>Add Document</span>
+        </p>
+
+        {attachments.length > 0 && (
+          <div style={{ marginTop: "15px" }}>
+            <p><strong>Attached Files:</strong></p>
+            <ul style={{ marginLeft: "20px" }}>
+              {attachments.map((att) => (
+                <li key={att.id} style={{ marginBottom: "8px", fontSize: "14px" }}>
+                  <span>{att.fileName} ({formatFileSize(att.fileSize)})</span>
+                  <button 
+                    onClick={() => handleDeleteAttachment(att.id)}
+                    style={{ marginLeft: "10px", padding: "2px 8px", fontSize: "12px" }}
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <hr />
 
+      {visitSavedMessage && (
+        <p style={{ color: "green", marginBottom: "15px" }}>
+          ✓ Visit saved! You can now upload files or click Done to return.
+        </p>
+      )}
+
       <div style={{ marginTop: "20px" }}>
-        <button onClick={handleSave} disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save Visit Record"}
-        </button>
+        {visitId ? (
+          <button onClick={() => router.push(`/clients/${id}`)}>Done</button>
+        ) : (
+          <button onClick={handleSave} disabled={isSaving || isUploadingFile}>
+              {isSaving ? "Saving..." : "Save Visit Record"}
+          </button>
+        )}
       </div>
 
     </main>
