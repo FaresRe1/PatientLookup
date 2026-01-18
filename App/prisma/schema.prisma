@@ -40,6 +40,7 @@ model Visit {
   client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   
   forms        VisitForm[]
+  attachments  VisitAttachment[]
 }
 
 model Template {
@@ -60,4 +61,17 @@ model VisitForm {
   template     Template @relation(fields: [templateId], references: [id])
   
   answers      String   // Stores the answers as a JSON String? Maybe?
+}
+
+model VisitAttachment {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  
+  visitId      String
+  visit        Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  
+  fileName     String   // Original file name (e.g., "photo.jpg", "scan.pdf")
+  fileType     String   // MIME type (e.g., "image/jpeg", "application/pdf")
+  fileData     Bytes    // Actual file content stored as BLOB
+  fileSize     Int      // Size in bytes
 }
