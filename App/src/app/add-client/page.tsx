@@ -10,6 +10,7 @@ export default function AddClientPage() {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
+  const [profileImage, setProfileImage] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -25,12 +26,18 @@ export default function AddClientPage() {
     }
 
     try {
+      const formData = new FormData();
+      formData.append('fullName', fullName);
+      formData.append('gender', gender);
+      formData.append('dob', dob);
+      if (email) formData.append('email', email);
+      if (phoneNumber) formData.append('phoneNumber', phoneNumber);
+      if (address) formData.append('address', address);
+      if (profileImage) formData.append('profileImage', profileImage);
+
       const response = await fetch("/api/clients", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ fullName, gender, dob, email, phoneNumber, address }),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -45,6 +52,7 @@ export default function AddClientPage() {
       setEmail("");
       setPhoneNumber("");
       setAddress("");
+      setProfileImage(null);
       router.push("/");
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
@@ -116,6 +124,24 @@ export default function AddClientPage() {
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="profileImage">Profile Image (Optional, max 5MB):</label>
+          <input
+            id="profileImage"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0] || null;
+              if (file && file.size > 5 * 1024 * 1024) {
+                alert("Profile image must be smaller than 5MB");
+                e.target.value = "";
+                setProfileImage(null);
+              } else {
+                setProfileImage(file);
+              }
+            }}
           />
         </div>
         <button type="submit">Add Patient</button>

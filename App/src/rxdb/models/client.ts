@@ -23,6 +23,7 @@ export const clientSchema: RxJsonSchema<Client> = {
     email: { type: ['string', 'null'] },
     phoneNumber: { type: ['string', 'null'] },
     address: { type: ['string', 'null'] },
+    profileImage: { type: ['string', 'null'] },
     createdAt: { type: 'string', format: 'date-time' },
     updatedAt: { type: 'string', format: 'date-time' },
     lastModified: { type: ['string', 'null'], format: 'date-time' },

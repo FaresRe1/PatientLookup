@@ -18,6 +18,7 @@ model Client {
   email        String?   @unique
   phoneNumber  String?
   address      String?
+  profileImage Bytes?
   
   deletedAt    DateTime?
   lastModified DateTime  @default(now())

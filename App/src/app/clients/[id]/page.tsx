@@ -178,7 +178,28 @@ export default function ClientDetails() {
                 )}
             </div>
 
-            <hr />
+            {/* Profile Image */}
+            <div style={{ margin: '20px 0' }}>
+                {client.profileImage ? (
+                    <img src={`data:image/jpeg;base64,${client.profileImage}`} alt="Profile" style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '8px' }} />
+                ) : (
+                    <div style={{
+                        width: '100px',
+                        height: '100px',
+                        backgroundColor: '#e5e7eb',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '2px solid #d1d5db'
+                    }}>
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="8" r="3" fill="#9ca3af"/>
+                            <path d="M12 14c-4 0-7 2-7 4v1h14v-1c0-2-3-4-7-4z" fill="#9ca3af"/>
+                        </svg>
+                    </div>
+                )}
+            </div>
 
             {/* Client Details / Edit Form */}
             <div style={{ margin: '20px 0' }}>

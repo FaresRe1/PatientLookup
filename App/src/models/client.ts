@@ -11,6 +11,7 @@ export const ClientBase = z.object({
   email: z.string().email("Invalid email address").optional().nullable().or(z.literal('')),
   phoneNumber: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
+  profileImage: z.instanceof(Uint8Array).optional(),
 });
 
 export const ClientCreate = ClientBase; // same shape for create in this app
@@ -25,6 +26,7 @@ export const ClientResponse = z.object({
   phoneNumber: z.string().nullable().optional(),
   address: z.string().nullable().optional(),
   dob: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.string()),
+  profileImage: z.string().optional().nullable(),
   revision: z.number().optional(),
   deletedAt: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.any().nullable().optional()),
   lastModified: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.string()),

@@ -17,7 +17,13 @@ export const GET = authWrapper(async (req: Request) => {
         });
 
         // Validate/normalize rows using ClientResponse
-        const clients = rows.map((r) => ClientResponse.parse(r));
+        const clients = rows.map((r) => {
+            const clientWithImage = {
+                ...r,
+                profileImage: r.profileImage ? Buffer.from(r.profileImage).toString('base64') : null,
+            };
+            return ClientResponse.parse(clientWithImage);
+        });
 
         return NextResponse.json({ clients });
     }
@@ -30,29 +36,56 @@ export const GET = authWrapper(async (req: Request) => {
 // To run use this POST request : http://localhost:3000/api/clients
 export const POST = authWrapper(async (req: Request) => {
     try {
-        const body = await req.json()
+        const formData = await req.formData();
 
-        const result = parseBody(ClientCreate, body);
+        const fullName = formData.get('fullName') as string;
+        const gender = formData.get('gender') as string;
+        const dob = formData.get('dob') as string;
+        const email = formData.get('email') as string;
+        const phoneNumber = formData.get('phoneNumber') as string;
+        const address = formData.get('address') as string;
+        const profileImageFile = formData.get('profileImage') as File | null;
+
+        // Validate profile image size (5MB limit for headshots)
+        const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+        if (profileImageFile && profileImageFile.size > MAX_PROFILE_IMAGE_SIZE) {
+            return NextResponse.json(
+                { msg: "Profile image size exceeds 5MB limit" },
+                { status: 400 }
+            );
+        }
+
+        let profileImage: Uint8Array | undefined;
+        if (profileImageFile) {
+            const arrayBuffer = await profileImageFile.arrayBuffer();
+            profileImage = new Uint8Array(arrayBuffer);
+        }
+
+        const data = {
+            fullName,
+            gender,
+            dob: new Date(dob),
+            email: email || null,
+            phoneNumber: phoneNumber || null,
+            address: address || null,
+            profileImage,
+        };
+
+        const result = parseBody(ClientCreate, data);
         if (!result.ok) {
             return NextResponse.json({ msg: "Validation failed", errors: result.errors }, { status: 400 });
         }
 
-        const { fullName, email, phoneNumber, address, dob, gender } = result.data;
-
         const newClient = await db.client.create({
-            data: {
-                fullName, 
-                gender,
-                dob: new Date(dob),
-                email: email || null, 
-                phoneNumber, 
-                address, 
-                
-            }
+            data: result.data,
         });
         
-        // Validate the created client before returning
-        const validated = ClientResponse.parse(newClient);
+        // For response, convert profileImage to base64 if present
+        const responseData = {
+            ...newClient,
+            profileImage: newClient.profileImage ? Buffer.from(newClient.profileImage).toString('base64') : null,
+        };
+        const validated = ClientResponse.parse(responseData);
         return NextResponse.json({ newClient: validated });
     }
     catch (error: any) {

@@ -27,7 +27,11 @@ export const GET = authWrapper(async (req: NextRequest, context: { params: Promi
             return NextResponse.json({ msg: 'Failed to find client information' }, { status: 404 });
         }
 
-        const validated = ClientResponse.parse(details);
+        const clientWithImage = {
+            ...details,
+            profileImage: details.profileImage ? Buffer.from(details.profileImage).toString('base64') : null,
+        };
+        const validated = ClientResponse.parse(clientWithImage);
         return NextResponse.json({ details: validated });
 
     } catch (error: any) {
@@ -56,13 +60,20 @@ export const PUT = authWrapper(async (req: NextRequest, context: { params: Promi
         if ((data as any).dob && !((data as any).dob instanceof Date)) {
             updateData.dob = new Date((data as any).dob);
         }
+        if ((data as any).profileImage && typeof (data as any).profileImage === 'string') {
+            updateData.profileImage = Uint8Array.from(Buffer.from((data as any).profileImage, 'base64'));
+        }
 
         const updatedClient = await db.client.update({
             where: { id: parsedId.data },
             data: updateData,
         });
 
-        const validated = ClientResponse.parse(updatedClient);
+        const clientWithImage = {
+            ...updatedClient,
+            profileImage: updatedClient.profileImage ? Buffer.from(updatedClient.profileImage).toString('base64') : null,
+        };
+        const validated = ClientResponse.parse(clientWithImage);
         return NextResponse.json({ msg: "Client updated successfully", details: validated });
 
     } catch (error: any) {
