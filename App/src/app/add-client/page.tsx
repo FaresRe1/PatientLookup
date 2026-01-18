@@ -15,7 +15,7 @@ export default function AddClientPage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const router = useRouter();
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, startNewVisit: boolean = false) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
@@ -45,6 +45,9 @@ export default function AddClientPage() {
         throw new Error(errorData.msg || "Failed to add client.");
       }
 
+      const responseData = await response.json();
+      const newClientId = responseData.newClient.id;
+
       setSuccess("Client added successfully!");
       setFullName("");
       setGender("")
@@ -53,7 +56,12 @@ export default function AddClientPage() {
       setPhoneNumber("");
       setAddress("");
       setProfileImage(null);
-      router.push("/");
+
+      if (startNewVisit) {
+        router.push(`/clients/${newClientId}/new-visit`);
+      } else {
+        router.push("/");
+      }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
     }
@@ -144,7 +152,12 @@ export default function AddClientPage() {
             }}
           />
         </div>
-        <button type="submit">Add Patient</button>
+        <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+          <button type="submit">Add Patient</button>
+          <button type="button" onClick={(e) => handleSubmit(e, true)} style={{ backgroundColor: '#059669', color: 'white' }}>
+            Add Patient and Start New Visit
+          </button>
+        </div>
       </form>
       <br />
       <button>
