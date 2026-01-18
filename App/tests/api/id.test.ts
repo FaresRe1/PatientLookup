@@ -180,6 +180,45 @@ describe("Clients API - PUT /api/clients/[id]", () => {
         expect(mockedDb.client.update).not.toHaveBeenCalled();
     });
 
+    it("updates client profile image", async () => {
+        const now = new Date();
+        const oldClient = makeClientRecord({ id: "abc123", fullName: "John Doe", createdAt: now, updatedAt: now });
+        
+        const updateData = {
+            fullName: "John Doe",
+        };
+
+        const imageBuffer = Buffer.from('new image data');
+        const updatedClient = makeClientRecord({ id: "abc123", fullName: "John Doe", profileImage: imageBuffer, createdAt: now, updatedAt: now });
+        mockedDb.client.update.mockResolvedValue(updatedClient);
+
+        const formData = new FormData();
+        formData.append('fullName', updateData.fullName);
+        const newImageFile = new File([imageBuffer], 'new-profile.jpg', { type: 'image/jpeg' });
+        formData.append('profileImage', newImageFile);
+
+        const response = await PUT(
+            new NextRequest("http://localhost:3000/api/clients/abc123", {
+                method: "PUT",
+                body: formData,
+            }),
+            { params: Promise.resolve({ id: "abc123" }) }
+        );
+
+        const json = await response.json();
+        
+        expect(response.status).toBe(200);
+        expect(json.msg).toBe("Client updated successfully");
+        expect(json.details.profileImage).toBe(imageBuffer.toString('base64'));
+        expect(mockedDb.client.update).toHaveBeenCalledWith({
+            where: { id: "abc123" },
+            data: expect.objectContaining({
+                fullName: "John Doe",
+                profileImage: imageBuffer,
+            }),
+        });
+    });
+
     it("handles database errors gracefully", async () => {
         mockedDb.client.update.mockRejectedValue(new Error("Database connection failed"));
 

@@ -75,10 +75,18 @@ describe("Clients API - POST", () => {
         const created = makeClientRecord({ id: "ckx789ghi", fullName: "Alice Johnson", email: "alice@example.com", phoneNumber: "9876543210", address: "456 Oak St", gender: "female", dob: now, createdAt: now, updatedAt: now });
         mockedDb.client.create.mockResolvedValue(created);
 
+        const formData = new FormData();
+        formData.append('fullName', clientData.fullName);
+        formData.append('gender', clientData.gender);
+        formData.append('dob', clientData.dob);
+        formData.append('email', clientData.email);
+        formData.append('phoneNumber', clientData.phoneNumber);
+        formData.append('address', clientData.address);
+
         const response = await POST(
             new Request("http://localhost/api/clients", {
                 method: "POST",
-                body: JSON.stringify(clientData),
+                body: formData,
             })
         );
         const json = await response.json();
@@ -95,17 +103,95 @@ describe("Clients API - POST", () => {
                 email: clientData.email,
                 phoneNumber: clientData.phoneNumber,
                 address: clientData.address,
+                profileImage: undefined,
             },
         });
     });
 
-    it("returns 400 if validation fails", async () => {
-        const invalidData = { email: "bob@example.com" };
+    it("creates a new client with profile image", async () => {
+        const now = new Date();
+        const clientData = {
+            fullName: "Bob Smith",
+            gender: "male",
+            dob: now.toISOString(),
+            email: "bob@example.com",
+        };
+
+        const imageBuffer = Buffer.from('fake image data');
+        const created = makeClientRecord({ id: "ckx101jkl", fullName: "Bob Smith", email: "bob@example.com", gender: "male", dob: now, profileImage: imageBuffer, createdAt: now, updatedAt: now });
+        mockedDb.client.create.mockResolvedValue(created);
+
+        const formData = new FormData();
+        formData.append('fullName', clientData.fullName);
+        formData.append('gender', clientData.gender);
+        formData.append('dob', clientData.dob);
+        formData.append('email', clientData.email);
+        // Mock file
+        const file = new File([imageBuffer], 'profile.jpg', { type: 'image/jpeg' });
+        formData.append('profileImage', file);
 
         const response = await POST(
             new Request("http://localhost/api/clients", {
                 method: "POST",
-                body: JSON.stringify(invalidData),
+                body: formData,
+            })
+        );
+        const json = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(json.newClient).toEqual(clientRecordToJson(created));
+
+        expect(mockedDb.client.create).toHaveBeenCalledWith({
+            data: expect.objectContaining({
+                fullName: clientData.fullName,
+                gender: clientData.gender,
+                dob: expect.any(Date),
+                email: clientData.email,
+                profileImage: imageBuffer,
+            }),
+        });
+    });
+
+    it("returns 400 if profile image is too large", async () => {
+        const now = new Date();
+        const clientData = {
+            fullName: "Large Image User",
+            gender: "male",
+            dob: now.toISOString(),
+            email: "large@example.com",
+        };
+
+        const formData = new FormData();
+        formData.append('fullName', clientData.fullName);
+        formData.append('gender', clientData.gender);
+        formData.append('dob', clientData.dob);
+        formData.append('email', clientData.email);
+        // Create a file larger than 5MB
+        const largeBuffer = new Uint8Array(6 * 1024 * 1024); // 6MB
+        const largeFile = new File([largeBuffer], 'large.jpg', { type: 'image/jpeg' });
+        formData.append('profileImage', largeFile);
+
+        const response = await POST(
+            new Request("http://localhost/api/clients", {
+                method: "POST",
+                body: formData,
+            })
+        );
+        const json = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(json.msg).toBe("Profile image size exceeds 5MB limit");
+        expect(mockedDb.client.create).not.toHaveBeenCalled();
+    });
+
+    it("returns 400 if validation fails", async () => {
+        const formData = new FormData();
+        formData.append('email', 'bob@example.com');
+
+        const response = await POST(
+            new Request("http://localhost/api/clients", {
+                method: "POST",
+                body: formData,
             })
         );
         const json = await response.json();
@@ -134,10 +220,16 @@ describe("Clients API - POST", () => {
             message: "Unique constraint failed",
         });
 
+        const formData = new FormData();
+        formData.append('fullName', clientData.fullName);
+        formData.append('gender', clientData.gender);
+        formData.append('dob', clientData.dob);
+        formData.append('email', clientData.email);
+
         const response = await POST(
             new Request("http://localhost/api/clients", {
                 method: "POST",
-                body: JSON.stringify(clientData),
+                body: formData,
             })
         );
         const json = await response.json();

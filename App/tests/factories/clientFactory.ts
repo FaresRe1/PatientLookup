@@ -31,6 +31,7 @@ export function makeClientRecord(overrides: Partial<Record<string, any>> = {}) {
     email: Object.prototype.hasOwnProperty.call(overrides, "email") ? overrides.email : `test${seq}@example.com`,
     phoneNumber: Object.prototype.hasOwnProperty.call(overrides, "phoneNumber") ? overrides.phoneNumber : `000000000${seq}`,
     address: Object.prototype.hasOwnProperty.call(overrides, "address") ? overrides.address : `Test Address ${seq}`,
+    profileImage: overrides.profileImage ?? null,
 
     deletedAt: overrides.deletedAt ?? null,
     lastModified: overrides.lastModified ?? now,
@@ -50,5 +51,6 @@ export function clientRecordToJson(c: any) {
     dob: c.dob instanceof Date ? c.dob.toISOString() : c.dob,
     lastModified: c.lastModified instanceof Date ? c.lastModified.toISOString() : c.lastModified,
     deletedAt: c.deletedAt instanceof Date ? c.deletedAt.toISOString() : c.deletedAt,
+    profileImage: c.profileImage ? Buffer.from(c.profileImage).toString('base64') : null,
   };
 }
