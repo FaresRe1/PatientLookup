@@ -8,7 +8,7 @@ const idSchema = z.string().min(1, "id is required");
 
 import { ClientCreate, ClientResponse } from "~/models/client";
 
-const updateClientSchema = ClientCreate.partial();
+const updateClientSchema = ClientCreate;
 
 export const GET = authWrapper(async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {
     try {

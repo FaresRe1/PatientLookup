@@ -85,7 +85,7 @@ export default function ClientDetails() {
         fetchData();
     }, [id]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
@@ -99,7 +99,10 @@ export default function ClientDetails() {
             
             if (newProfileImage) {
                 const formDataToSend = new FormData();
-                Object.entries(formData).forEach(([key, value]) => {
+                // Only include updateable fields
+                const updateableFields = ['fullName', 'gender', 'dob', 'email', 'phoneNumber', 'address', 'drugHistory', 'familyHistory', 'socialHistory'];
+                updateableFields.forEach(key => {
+                    const value = formData[key as keyof typeof formData];
                     if (value !== null && value !== undefined) {
                         formDataToSend.append(key, value.toString());
                     }
@@ -111,10 +114,22 @@ export default function ClientDetails() {
                     body: formDataToSend,
                 });
             } else {
+                const updateData = {
+                    fullName: formData.fullName,
+                    gender: formData.gender,
+                    dob: formData.dob,
+                    email: formData.email,
+                    phoneNumber: formData.phoneNumber,
+                    address: formData.address,
+                    drugHistory: formData.drugHistory,
+                    familyHistory: formData.familyHistory,
+                    socialHistory: formData.socialHistory,
+                };
+                
                 res = await fetch(`/api/clients/${id}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formData),
+                    body: JSON.stringify(updateData),
                 });
             }
 
@@ -332,6 +347,51 @@ export default function ClientDetails() {
                         <input name="address" value={formData.address || ""} onChange={handleInputChange} />
                     ) : (
                         <span>{client.address || "N/A"}</span>
+                    )}
+                </div>
+
+                <div style={{ marginBottom: '10px' }}>
+                    <strong>Dh - Drug History: </strong>
+                    {isEditing ? (
+                        <textarea
+                            name="drugHistory"
+                            value={formData.drugHistory || ""}
+                            onChange={handleInputChange}
+                            rows={4}
+                            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
+                        />
+                    ) : (
+                        <span>{client.drugHistory || "NA"}</span>
+                    )}
+                </div>
+
+                <div style={{ marginBottom: '10px' }}>
+                    <strong>Fh - Family History: </strong>
+                    {isEditing ? (
+                        <textarea
+                            name="familyHistory"
+                            value={formData.familyHistory || ""}
+                            onChange={handleInputChange}
+                            rows={4}
+                            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
+                        />
+                    ) : (
+                        <span>{client.familyHistory || "NA"}</span>
+                    )}
+                </div>
+
+                <div style={{ marginBottom: '10px' }}>
+                    <strong>Sh - Social History: </strong>
+                    {isEditing ? (
+                        <textarea
+                            name="socialHistory"
+                            value={formData.socialHistory || ""}
+                            onChange={handleInputChange}
+                            rows={4}
+                            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
+                        />
+                    ) : (
+                        <span>{client.socialHistory || "NA"}</span>
                     )}
                 </div>
             </div>
