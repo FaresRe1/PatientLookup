@@ -10,6 +10,9 @@ export default function AddClientPage() {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
+  const [drugHistory, setDrugHistory] = useState("");
+  const [familyHistory, setFamilyHistory] = useState("");
+  const [socialHistory, setSocialHistory] = useState("");
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -24,12 +27,27 @@ export default function AddClientPage() {
       setError("Full Name is required.");
       return;
     }
+    if (!drugHistory.trim()) {
+      setError("Drug History (Dh) is required.");
+      return;
+    }
+    if (!familyHistory.trim()) {
+      setError("Family History (Fh) is required.");
+      return;
+    }
+    if (!socialHistory.trim()) {
+      setError("Social History (Sh) is required.");
+      return;
+    }
 
     try {
       const formData = new FormData();
       formData.append('fullName', fullName);
       formData.append('gender', gender);
       formData.append('dob', dob);
+      formData.append('drugHistory', drugHistory);
+      formData.append('familyHistory', familyHistory);
+      formData.append('socialHistory', socialHistory);
       if (email) formData.append('email', email);
       if (phoneNumber) formData.append('phoneNumber', phoneNumber);
       if (address) formData.append('address', address);
@@ -52,6 +70,9 @@ export default function AddClientPage() {
       setFullName("");
       setGender("")
       setDob("");
+      setDrugHistory("");
+      setFamilyHistory("");
+      setSocialHistory("");
       setEmail("");
       setPhoneNumber("");
       setAddress("");
@@ -132,6 +153,39 @@ export default function AddClientPage() {
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="drugHistory">Dh - Drug History (Required):</label>
+          <textarea
+            id="drugHistory"
+            value={drugHistory}
+            onChange={(e) => setDrugHistory(e.target.value)}
+            required
+            rows={4}
+            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
+          />
+        </div>
+        <div>
+          <label htmlFor="familyHistory">Fh - Family History (Required):</label>
+          <textarea
+            id="familyHistory"
+            value={familyHistory}
+            onChange={(e) => setFamilyHistory(e.target.value)}
+            required
+            rows={4}
+            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
+          />
+        </div>
+        <div>
+          <label htmlFor="socialHistory">Sh - Social History (Required):</label>
+          <textarea
+            id="socialHistory"
+            value={socialHistory}
+            onChange={(e) => setSocialHistory(e.target.value)}
+            required
+            rows={4}
+            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
           />
         </div>
         <div>

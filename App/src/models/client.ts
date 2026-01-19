@@ -12,6 +12,9 @@ export const ClientBase = z.object({
   phoneNumber: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
   profileImage: z.instanceof(Uint8Array).optional(),
+  drugHistory: z.string().min(1, "Drug history is required"),
+  familyHistory: z.string().min(1, "Family history is required"),
+  socialHistory: z.string().min(1, "Social history is required"),
 });
 
 export const ClientCreate = ClientBase; // same shape for create in this app
@@ -27,6 +30,9 @@ export const ClientResponse = z.object({
   address: z.string().nullable().optional(),
   dob: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.string()),
   profileImage: z.string().optional().nullable(),
+  drugHistory: z.string(),
+  familyHistory: z.string(),
+  socialHistory: z.string(),
   revision: z.number().optional(),
   deletedAt: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.any().nullable().optional()),
   lastModified: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.string()),

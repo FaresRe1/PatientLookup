@@ -44,6 +44,9 @@ export const POST = authWrapper(async (req: Request) => {
         const email = formData.get('email') as string;
         const phoneNumber = formData.get('phoneNumber') as string;
         const address = formData.get('address') as string;
+        const drugHistory = formData.get('drugHistory') as string;
+        const familyHistory = formData.get('familyHistory') as string;
+        const socialHistory = formData.get('socialHistory') as string;
         const profileImageFile = formData.get('profileImage') as File | null;
 
         // Validate profile image size (5MB limit for headshots)
@@ -68,6 +71,9 @@ export const POST = authWrapper(async (req: Request) => {
             email: email || null,
             phoneNumber: phoneNumber || null,
             address: address || null,
+            drugHistory,
+            familyHistory,
+            socialHistory,
             profileImage,
         };
 

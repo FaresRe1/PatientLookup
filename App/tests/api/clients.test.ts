@@ -70,6 +70,9 @@ describe("Clients API - POST", () => {
             email: "alice@example.com",
             phoneNumber: "9876543210",
             address: "456 Oak St",
+            drugHistory: "No known drug allergies",
+            familyHistory: "Family history of diabetes",
+            socialHistory: "Non-smoker",
         };
 
         const created = makeClientRecord({ id: "ckx789ghi", fullName: "Alice Johnson", email: "alice@example.com", phoneNumber: "9876543210", address: "456 Oak St", gender: "female", dob: now, createdAt: now, updatedAt: now });
@@ -82,6 +85,9 @@ describe("Clients API - POST", () => {
         formData.append('email', clientData.email);
         formData.append('phoneNumber', clientData.phoneNumber);
         formData.append('address', clientData.address);
+        formData.append('drugHistory', clientData.drugHistory);
+        formData.append('familyHistory', clientData.familyHistory);
+        formData.append('socialHistory', clientData.socialHistory);
 
         const response = await POST(
             new Request("http://localhost/api/clients", {
@@ -103,6 +109,9 @@ describe("Clients API - POST", () => {
                 email: clientData.email,
                 phoneNumber: clientData.phoneNumber,
                 address: clientData.address,
+                drugHistory: clientData.drugHistory,
+                familyHistory: clientData.familyHistory,
+                socialHistory: clientData.socialHistory,
                 profileImage: undefined,
             },
         });
@@ -115,6 +124,9 @@ describe("Clients API - POST", () => {
             gender: "male",
             dob: now.toISOString(),
             email: "bob@example.com",
+            drugHistory: "Allergic to penicillin",
+            familyHistory: "Heart disease in family",
+            socialHistory: "Occasional smoker",
         };
 
         const imageBuffer = Buffer.from('fake image data');
@@ -126,6 +138,9 @@ describe("Clients API - POST", () => {
         formData.append('gender', clientData.gender);
         formData.append('dob', clientData.dob);
         formData.append('email', clientData.email);
+        formData.append('drugHistory', clientData.drugHistory);
+        formData.append('familyHistory', clientData.familyHistory);
+        formData.append('socialHistory', clientData.socialHistory);
         // Mock file
         const file = new File([imageBuffer], 'profile.jpg', { type: 'image/jpeg' });
         formData.append('profileImage', file);
@@ -147,6 +162,9 @@ describe("Clients API - POST", () => {
                 gender: clientData.gender,
                 dob: expect.any(Date),
                 email: clientData.email,
+                drugHistory: clientData.drugHistory,
+                familyHistory: clientData.familyHistory,
+                socialHistory: clientData.socialHistory,
                 profileImage: imageBuffer,
             }),
         });
@@ -159,6 +177,9 @@ describe("Clients API - POST", () => {
             gender: "male",
             dob: now.toISOString(),
             email: "large@example.com",
+            drugHistory: "No drugs",
+            familyHistory: "No issues",
+            socialHistory: "Healthy",
         };
 
         const formData = new FormData();
@@ -166,6 +187,9 @@ describe("Clients API - POST", () => {
         formData.append('gender', clientData.gender);
         formData.append('dob', clientData.dob);
         formData.append('email', clientData.email);
+        formData.append('drugHistory', clientData.drugHistory);
+        formData.append('familyHistory', clientData.familyHistory);
+        formData.append('socialHistory', clientData.socialHistory);
         // Create a file larger than 5MB
         const largeBuffer = new Uint8Array(6 * 1024 * 1024); // 6MB
         const largeFile = new File([largeBuffer], 'large.jpg', { type: 'image/jpeg' });
@@ -212,6 +236,9 @@ describe("Clients API - POST", () => {
             email: "existing@example.com",
             phoneNumber: undefined,
             address: undefined,
+            drugHistory: "History",
+            familyHistory: "Family",
+            socialHistory: "Social",
         };
 
         // Mock P2002 error
@@ -225,6 +252,9 @@ describe("Clients API - POST", () => {
         formData.append('gender', clientData.gender);
         formData.append('dob', clientData.dob);
         formData.append('email', clientData.email);
+        formData.append('drugHistory', clientData.drugHistory);
+        formData.append('familyHistory', clientData.familyHistory);
+        formData.append('socialHistory', clientData.socialHistory);
 
         const response = await POST(
             new Request("http://localhost/api/clients", {

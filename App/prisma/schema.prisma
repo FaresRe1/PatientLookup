@@ -19,6 +19,9 @@ model Client {
   phoneNumber  String?
   address      String?
   profileImage Bytes?
+  drugHistory  String    @default("")
+  familyHistory String   @default("")
+  socialHistory String   @default("")
   
   deletedAt    DateTime?
   lastModified DateTime  @default(now())
