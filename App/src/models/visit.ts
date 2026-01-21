@@ -3,6 +3,11 @@ import { z } from "zod";
 export const VisitBase = z.object({
   clientId: z.string().min(1, "Client ID is required"),
   doctorName: z.string().min(1, "Doctor name is required"),
+  presentingComplaint: z.string().optional().nullable(),
+  historyOfPresentingComplaint: z.string().optional().nullable(),
+  observationAndExamination: z.string().optional().nullable(),
+  impression: z.string().optional().nullable(),
+  plan: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   visitDate: z.preprocess((v) => {
     if (typeof v === "string" && v) return new Date(v as string);
@@ -27,6 +32,11 @@ export const VisitResponse = z.object({
   createdAt: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.string()),
   visitDate: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.string()),
   doctorName: z.string(),
+  presentingComplaint: z.string().nullable().optional(),
+  historyOfPresentingComplaint: z.string().nullable().optional(),
+  observationAndExamination: z.string().nullable().optional(),
+  impression: z.string().nullable().optional(),
+  plan: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
   clientId: z.string(),
   forms: z

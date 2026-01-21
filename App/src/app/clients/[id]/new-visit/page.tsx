@@ -20,6 +20,11 @@ export default function NewVisitPage() {
 
   const [visitDate, setVisitDate] = useState(new Date().toISOString().split('T')[0]); 
   const [doctorName, setDoctorName] = useState("");
+  const [presentingComplaint, setPresentingComplaint] = useState("");
+  const [historyOfPresentingComplaint, setHistoryOfPresentingComplaint] = useState("");
+  const [observationAndExamination, setObservationAndExamination] = useState("");
+  const [impression, setImpression] = useState("");
+  const [plan, setPlan] = useState("");
   const [notes, setNotes] = useState("");
   
   const [visitId, setVisitId] = useState<string | null>(null);
@@ -129,6 +134,11 @@ export default function NewVisitPage() {
         body: JSON.stringify({
           clientId: id,
           doctorName: doctorName,
+          presentingComplaint: presentingComplaint,
+          historyOfPresentingComplaint: historyOfPresentingComplaint,
+          observationAndExamination: observationAndExamination,
+          impression: impression,
+          plan: plan,
           notes: notes,
           visitDate: visitDate,
         }),
@@ -190,7 +200,57 @@ export default function NewVisitPage() {
       </div>
 
       <div style={{ margin: "20px 0" }}>
-        <p><strong>Notes:</strong></p>
+        <p><strong>pc - Presenting Complaint:</strong></p>
+        <textarea 
+            value={presentingComplaint}
+            onChange={(e) => setPresentingComplaint(e.target.value)}
+            rows={5}
+            style={{ width: "100%", maxWidth: "500px" }}
+        />
+      </div>
+
+      <div style={{ margin: "20px 0" }}>
+        <p><strong>hpc - History of Presenting Complaint:</strong></p>
+        <textarea 
+            value={historyOfPresentingComplaint}
+            onChange={(e) => setHistoryOfPresentingComplaint(e.target.value)}
+            rows={5}
+            style={{ width: "100%", maxWidth: "500px" }}
+        />
+      </div>
+
+      <div style={{ margin: "20px 0" }}>
+        <p><strong>oe - Observation and Examination:</strong></p>
+        <textarea 
+            value={observationAndExamination}
+            onChange={(e) => setObservationAndExamination(e.target.value)}
+            rows={5}
+            style={{ width: "100%", maxWidth: "500px" }}
+        />
+      </div>
+
+      <div style={{ margin: "20px 0" }}>
+        <p><strong>Impression:</strong></p>
+        <textarea 
+            value={impression}
+            onChange={(e) => setImpression(e.target.value)}
+            rows={5}
+            style={{ width: "100%", maxWidth: "500px" }}
+        />
+      </div>
+
+      <div style={{ margin: "20px 0" }}>
+        <p><strong>Plan:</strong></p>
+        <textarea 
+            value={plan}
+            onChange={(e) => setPlan(e.target.value)}
+            rows={5}
+            style={{ width: "100%", maxWidth: "500px" }}
+        />
+      </div>
+
+      <div style={{ margin: "20px 0" }}>
+        <p><strong>Extra Notes:</strong></p>
         <textarea 
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -249,7 +309,7 @@ export default function NewVisitPage() {
 
       {visitSavedMessage && (
         <p style={{ color: "green", marginBottom: "15px" }}>
-          ✓ Visit saved! You can now upload files or click Done to return.
+          Visit saved! You can now upload files or click Done to return.
         </p>
       )}
 

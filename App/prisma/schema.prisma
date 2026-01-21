@@ -36,9 +36,14 @@ model Visit {
   id           String   @id @default(cuid())
   createdAt    DateTime @default(now())
   
-  visitDate    DateTime @default(now())
-  doctorName   String
-  notes        String?  
+  visitDate                    DateTime @default(now())
+  doctorName                   String
+  presentingComplaint          String @default("")
+  historyOfPresentingComplaint String @default("")
+  observationAndExamination    String @default("")
+  impression                   String @default("")
+  plan                         String @default("")
+  notes                        String?  
   
   clientId     String
   client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)

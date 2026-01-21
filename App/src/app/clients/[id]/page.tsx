@@ -16,6 +16,11 @@ type Visit = {
     visitDate: string;
     doctorName: string;
     notes: string;
+    presentingComplaint?: string;
+    historyOfPresentingComplaint?: string;
+    observationAndExamination?: string;
+    impression?: string;
+    plan?: string;
     attachments?: AttachmentType[];
 };
 
@@ -415,7 +420,12 @@ export default function ClientDetails() {
                             <li key={visit.id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 0' }}>
                                 <p><strong>Date:</strong> {new Date(visit.visitDate).toLocaleDateString()}</p>
                                 <p><strong>Doctor:</strong> {visit.doctorName}</p>
-                                <p><strong>Notes:</strong> {visit.notes}</p>
+                                <p><strong>pc - Presenting Complaint:</strong> {visit.presentingComplaint}</p>
+                                <p><strong>hpc - History of Presenting Complaint:</strong> {visit.historyOfPresentingComplaint} </p>
+                                <p><strong>oe - Observation and Examination:</strong> {visit.observationAndExamination} </p>
+                                <p><strong>Impression:</strong> {visit.impression} </p>
+                                <p><strong>Plan:</strong> {visit.plan} </p>
+                                <p><strong>Notes:</strong> {visit.notes} </p>
                                 
                                 {visit.attachments && visit.attachments.length > 0 && (
                                     <div style={{ marginTop: '10px' }}>

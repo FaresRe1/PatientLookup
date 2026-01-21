@@ -30,6 +30,11 @@ describe("Visits API - GET", () => {
             id: "v1",
             clientId: "client123",
             doctorName: "Dr. Smith",
+            presentingComplaint: "Headache",
+            historyOfPresentingComplaint: "Started 2 days ago",
+            observationAndExamination: "Normal vitals",
+            impression: "Tension headache",
+            plan: "Prescribe painkillers",
             notes: "Regular checkup",
             visitDate: now,
             createdAt: now,
@@ -39,6 +44,11 @@ describe("Visits API - GET", () => {
             id: "v2",
             clientId: "client123",
             doctorName: "Dr. Johnson",
+            presentingComplaint: "Back pain",
+            historyOfPresentingComplaint: "Injury from lifting",
+            observationAndExamination: "Tenderness in lower back",
+            impression: "Muscle strain",
+            plan: "Rest and physiotherapy",
             notes: "Follow-up visit",
             visitDate: new Date(now.getTime() - 86400000), // 1 day ago
             createdAt: new Date(now.getTime() - 86400000),
@@ -110,6 +120,11 @@ describe("Visits API - POST", () => {
         const visitData = {
             clientId: "client123",
             doctorName: "Dr. Smith",
+            presentingComplaint: "Headache",
+            historyOfPresentingComplaint: "Started 2 days ago",
+            observationAndExamination: "Normal vitals",
+            impression: "Tension headache",
+            plan: "Prescribe painkillers",
             notes: "Regular checkup",
             visitDate: now.toISOString(),
         };
@@ -118,6 +133,11 @@ describe("Visits API - POST", () => {
             id: "visit123",
             clientId: "client123",
             doctorName: "Dr. Smith",
+            presentingComplaint: "Headache",
+            historyOfPresentingComplaint: "Started 2 days ago",
+            observationAndExamination: "Normal vitals",
+            impression: "Tension headache",
+            plan: "Prescribe painkillers",
             notes: "Regular checkup",
             visitDate: now,
             createdAt: now,
@@ -138,12 +158,22 @@ describe("Visits API - POST", () => {
         expect(json.id).toBe("visit123");
         expect(json.clientId).toBe("client123");
         expect(json.doctorName).toBe("Dr. Smith");
+        expect(json.presentingComplaint).toBe("Headache");
+        expect(json.historyOfPresentingComplaint).toBe("Started 2 days ago");
+        expect(json.observationAndExamination).toBe("Normal vitals");
+        expect(json.impression).toBe("Tension headache");
+        expect(json.plan).toBe("Prescribe painkillers");
         expect(json.notes).toBe("Regular checkup");
 
         expect(mockedDb.visit.create).toHaveBeenCalledWith({
             data: {
                 clientId: "client123",
                 doctorName: "Dr. Smith",
+                presentingComplaint: "Headache",
+                historyOfPresentingComplaint: "Started 2 days ago",
+                observationAndExamination: "Normal vitals",
+                impression: "Tension headache",
+                plan: "Prescribe painkillers",
                 notes: "Regular checkup",
                 visitDate: expect.any(Date),
             },
@@ -162,6 +192,11 @@ describe("Visits API - POST", () => {
             id: "visit456",
             clientId: "client456",
             doctorName: "Dr. Johnson",
+            presentingComplaint: "",
+            historyOfPresentingComplaint: "",
+            observationAndExamination: "",
+            impression: "",
+            plan: "",
             notes: "",
             visitDate: now,
             createdAt: now,

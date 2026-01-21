@@ -49,6 +49,11 @@ export const POST = authWrapper(async (req: NextRequest) => {
             data: {
                 clientId: data.clientId,
                 doctorName: data.doctorName,
+                presentingComplaint: data.presentingComplaint || "",
+                historyOfPresentingComplaint: data.historyOfPresentingComplaint || "",
+                observationAndExamination: data.observationAndExamination || "",
+                impression: data.impression || "",
+                plan: data.plan || "",
                 notes: data.notes || "",
                 visitDate: data.visitDate instanceof Date ? data.visitDate : new Date(data.visitDate)
             }
