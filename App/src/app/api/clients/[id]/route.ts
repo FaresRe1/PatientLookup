@@ -8,7 +8,7 @@ const idSchema = z.string().min(1, "id is required");
 
 import { ClientCreate, ClientResponse } from "~/models/client";
 
-const updateClientSchema = ClientCreate.partial();
+const updateClientSchema = ClientCreate;
 
 export const GET = authWrapper(async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {
     try {
@@ -27,7 +27,11 @@ export const GET = authWrapper(async (req: NextRequest, context: { params: Promi
             return NextResponse.json({ msg: 'Failed to find client information' }, { status: 404 });
         }
 
-        const validated = ClientResponse.parse(details);
+        const clientWithImage = {
+            ...details,
+            profileImage: details.profileImage ? Buffer.from(details.profileImage).toString('base64') : null,
+        };
+        const validated = ClientResponse.parse(clientWithImage);
         return NextResponse.json({ details: validated });
 
     } catch (error: any) {
@@ -43,7 +47,24 @@ export const PUT = authWrapper(async (req: NextRequest, context: { params: Promi
             return NextResponse.json({ msg: "Invalid ID" }, { status: 400 });
         }
 
-        const body = await req.json();
+        // Check if request has FormData (file upload) or JSON
+        const contentType = req.headers.get('content-type') || '';
+        let body: any;
+        let profileImageFile: File | null = null;
+
+        if (contentType.includes('multipart/form-data')) {
+            const formData = await req.formData();
+            profileImageFile = formData.get('profileImage') as File | null;
+            
+            body = {};
+            for (const [key, value] of formData.entries()) {
+                if (key !== 'profileImage') {
+                    body[key] = value;
+                }
+            }
+        } else {
+            body = await req.json();
+        }
         const parsed = parseBody(updateClientSchema, body);
         if (!parsed.ok) {
             return NextResponse.json({ msg: "Validation failed", errors: parsed.errors }, { status: 400 });
@@ -51,10 +72,29 @@ export const PUT = authWrapper(async (req: NextRequest, context: { params: Promi
 
         const data = parsed.data;
 
+        let profileImage: Uint8Array | undefined;
+        if (profileImageFile) {
+            const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+            if (profileImageFile.size > MAX_PROFILE_IMAGE_SIZE) {
+                return NextResponse.json(
+                    { msg: "Profile image size exceeds 5MB limit" },
+                    { status: 400 }
+                );
+            }
+            
+            const arrayBuffer = await profileImageFile.arrayBuffer();
+            profileImage = new Uint8Array(arrayBuffer);
+        }
+
         // Ensure dob is a Date for Prisma (ClientCreate preprocess already converts strings to Date)
         const updateData: any = { ...(data as Record<string, any>) };
         if ((data as any).dob && !((data as any).dob instanceof Date)) {
             updateData.dob = new Date((data as any).dob);
+        }
+        if (profileImage !== undefined) {
+            updateData.profileImage = profileImage;
+        } else if ((data as any).profileImage && typeof (data as any).profileImage === 'string') {
+            updateData.profileImage = Uint8Array.from(Buffer.from((data as any).profileImage, 'base64'));
         }
 
         const updatedClient = await db.client.update({
@@ -62,7 +102,11 @@ export const PUT = authWrapper(async (req: NextRequest, context: { params: Promi
             data: updateData,
         });
 
-        const validated = ClientResponse.parse(updatedClient);
+        const clientWithImage = {
+            ...updatedClient,
+            profileImage: updatedClient.profileImage ? Buffer.from(updatedClient.profileImage).toString('base64') : null,
+        };
+        const validated = ClientResponse.parse(clientWithImage);
         return NextResponse.json({ msg: "Client updated successfully", details: validated });
 
     } catch (error: any) {

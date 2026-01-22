@@ -10,6 +10,9 @@ export function makeClient(overrides: Partial<Record<string, any>> = {}) {
     phoneNumber: `000000000${seq}`,
     address: `Test Address ${seq}`,
     dob: "1990-01-01",
+    drugHistory: `Drug history for user ${seq}`,
+    familyHistory: `Family history for user ${seq}`,
+    socialHistory: `Social history for user ${seq}`,
     ...overrides,
   };
 
@@ -31,6 +34,10 @@ export function makeClientRecord(overrides: Partial<Record<string, any>> = {}) {
     email: Object.prototype.hasOwnProperty.call(overrides, "email") ? overrides.email : `test${seq}@example.com`,
     phoneNumber: Object.prototype.hasOwnProperty.call(overrides, "phoneNumber") ? overrides.phoneNumber : `000000000${seq}`,
     address: Object.prototype.hasOwnProperty.call(overrides, "address") ? overrides.address : `Test Address ${seq}`,
+    profileImage: overrides.profileImage ?? null,
+    drugHistory: overrides.drugHistory ?? `Drug history for user ${seq}`,
+    familyHistory: overrides.familyHistory ?? `Family history for user ${seq}`,
+    socialHistory: overrides.socialHistory ?? `Social history for user ${seq}`,
 
     deletedAt: overrides.deletedAt ?? null,
     lastModified: overrides.lastModified ?? now,
@@ -50,5 +57,9 @@ export function clientRecordToJson(c: any) {
     dob: c.dob instanceof Date ? c.dob.toISOString() : c.dob,
     lastModified: c.lastModified instanceof Date ? c.lastModified.toISOString() : c.lastModified,
     deletedAt: c.deletedAt instanceof Date ? c.deletedAt.toISOString() : c.deletedAt,
+    profileImage: c.profileImage ? Buffer.from(c.profileImage).toString('base64') : null,
+    drugHistory: c.drugHistory,
+    familyHistory: c.familyHistory,
+    socialHistory: c.socialHistory,
   };
 }

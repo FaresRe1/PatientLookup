@@ -26,6 +26,11 @@ export const visitSchema: RxJsonSchema<Visit> = {
     },
     doctorName: { type: 'string' },
     visitDate: { type: 'string', format: 'date-time' },
+    presentingComplaint: { type: ['string', 'null'] },
+    historyOfPresentingComplaint: { type: ['string', 'null'] },
+    observationAndExamination: { type: ['string', 'null'] },
+    impression: { type: ['string', 'null'] },
+    plan: { type: ['string', 'null'] },
     notes: { type: ['string', 'null'] },
     forms: {
       type: 'array',

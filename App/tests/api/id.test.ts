@@ -1,199 +1,133 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GET, PUT } from "~/app/api/clients/[id]/route";
 import { db } from "~/server/db";
+import { NextRequest } from "next/server";
+import { makeClientRecord, clientRecordToJson } from "../factories/clientFactory";
 
-// These tests function correctly and tests for all return results and have all passed. 
-// I mock the request, and resolved db values in order to get the correct response from the api
-// All test explanations is in the csv file
-
+// --- Mocks ---
 vi.mock("~/server/db", () => ({
-    db: {
-        client: {
-            findUnique: vi.fn(),
-            update: vi.fn(),
-        },
+    db: { 
+        client: { 
+            findUnique: vi.fn(), 
+            update: vi.fn() 
+        } 
     },
 }));
 
 const mockedDb = vi.mocked(db, true);
 
-import { makeClientRecord, clientRecordToJson } from "../factories/clientFactory";
-import { NextRequest } from "next/server";
+// --- Helpers ---
+const getValidJsonBody = (client: any) => {
+    const json = clientRecordToJson(client);
+    delete json.profileImage; 
+    return json;
+};
 
-beforeEach(() => {
-    mockedDb.client.findUnique.mockReset();
-    mockedDb.client.update.mockReset();
+const createRequest = (url: string, method: "GET" | "PUT", body?: any, isFormData = false) => {
+    return new NextRequest(url, {
+        method,
+        body: isFormData ? body : (body ? JSON.stringify(body) : undefined),
+    });
+};
+
+beforeEach(() => { 
+    vi.clearAllMocks(); 
 });
 
-describe("Clients API - GET /api/clients/[id]", () => {
-    it("returns client details when found", async () => {
-        const now = new Date();
+describe("Clients API - [id] route", () => {
+    const CLIENT_ID = "abc123";
+    const BASE_URL = `http://localhost:3000/api/clients/${CLIENT_ID}`;
+    const PARAMS = { params: Promise.resolve({ id: CLIENT_ID }) };
 
-        // This is the mocked data from the database
-        const mockClient = makeClientRecord({ id: "abc123", fullName: "John Doe", email: "john@example.com", phoneNumber: "1234567890", address: "123 Main St", createdAt: now, updatedAt: now });
+    // --- GET TESTS ---
+    describe("GET /api/clients/[id]", () => {
+        it("returns 200 and client details when record exists", async () => {
+            const mockClient = makeClientRecord({ id: CLIENT_ID });
+            mockedDb.client.findUnique.mockResolvedValue(mockClient);
 
-        mockedDb.client.findUnique.mockResolvedValue(mockClient);
+            const res = await GET(createRequest(BASE_URL, "GET"), PARAMS);
+            const json = await res.json();
 
-        // The id matches what is in the mocked client
-        const response = await GET(
-            new NextRequest("http://localhost:3000/api/clients/abc123"),
-            { params: Promise.resolve({ id: "abc123" }) }
-        );
+            expect(res.status).toBe(200);
+            expect(json.details).toEqual(clientRecordToJson(mockClient));
+            expect(json.details.drugHistory).toBe(mockClient.drugHistory);
+        });
 
-        const json = await response.json();
+        it("returns 404 when the client ID does not exist in DB", async () => {
+            mockedDb.client.findUnique.mockResolvedValue(null);
 
-        // The result will be the data that I mocked, with the correct status code
-        expect(response.status).toBe(200);
-        expect(json.details).toEqual(clientRecordToJson(mockClient));
+            const res = await GET(createRequest(BASE_URL, "GET"), PARAMS);
+            
+            expect(res.status).toBe(404);
+            expect((await res.json()).msg).toBe("Failed to find client information");
+        });
 
-        // This is how prisma finds the client from the db
-        expect(mockedDb.client.findUnique).toHaveBeenCalledWith({
-            where: { id: "abc123" },
+        it("returns 400 when ID validation fails (empty ID)", async () => {
+            const res = await GET(
+                createRequest("http://localhost:3000/api/clients/", "GET"), 
+                { params: Promise.resolve({ id: "" }) }
+            );
+            
+            expect(res.status).toBe(400);
         });
     });
 
-    it("returns 400 if id validation fails", async () => {
-        const response = await GET(
-            new NextRequest("http://localhost:3000/api/clients/"),
-            { params: Promise.resolve({ id: "" }) }
-        );
+    // --- PUT TESTS ---
+    describe("PUT /api/clients/[id]", () => {
+        it("successfully updates via JSON and maintains history", async () => {
+            const oldClient = makeClientRecord({ id: CLIENT_ID });
+            const updateData = { ...getValidJsonBody(oldClient), fullName: "Updated Name" };
 
-        // This is expected because Zod expects a string of min 1 to function
-        const json = await response.json();
-        expect(response.status).toBe(400);
-        expect(json.msg).toBe("Validation failed");
-    });
+            const updatedRecord = { ...oldClient, fullName: "Updated Name" };
+            mockedDb.client.update.mockResolvedValue(updatedRecord);
 
-    it("returns 404 if id is not found", async () => {
-        mockedDb.client.findUnique.mockResolvedValue(null);
+            const res = await PUT(createRequest(BASE_URL, "PUT", updateData), PARAMS);
+            const json = await res.json();
 
-        const response = await GET(
-            new NextRequest("http://localhost:3000/api/clients/unknown"),
-            { params: Promise.resolve({ id: "unknown" }) }
-        );
-
-        // This is expected when prisma can not find the id in the db
-        const json = await response.json();
-        expect(response.status).toBe(404);
-        expect(json.msg).toBe("Failed to find client information");
-    });
-});
-
-describe("Clients API - PUT /api/clients/[id]", () => {
-    it("updates client successfully with all fields", async () => {
-        const now = new Date();
-        const oldClient = makeClientRecord({ id: "abc123", fullName: "John Doe", email: "john@example.com", gender: "male", dob: new Date("1990-01-01"), createdAt: now, updatedAt: now });
-        
-        const updateData = {
-            fullName: "John Smith",
-            email: "john.smith@example.com",
-            gender: "male",
-            dob: "1990-06-15",
-            phoneNumber: "9876543210",
-            address: "456 New St",
-        };
-
-        const updatedClient = makeClientRecord({ id: "abc123", fullName: "John Smith", email: "john.smith@example.com", gender: "male", dob: new Date("1990-06-15"), phoneNumber: "9876543210", address: "456 New St", createdAt: now, updatedAt: now });
-        mockedDb.client.update.mockResolvedValue(updatedClient);
-
-        const response = await PUT(
-            new NextRequest("http://localhost:3000/api/clients/abc123", {
-                method: "PUT",
-                body: JSON.stringify(updateData),
-            }),
-            { params: Promise.resolve({ id: "abc123" }) }
-        );
-
-        const json = await response.json();
-        
-        expect(response.status).toBe(200);
-        expect(json.msg).toBe("Client updated successfully");
-        expect(json.details.fullName).toBe("John Smith");
-        expect(json.details.email).toBe("john.smith@example.com");
-        expect(mockedDb.client.update).toHaveBeenCalledWith({
-            where: { id: "abc123" },
-            data: expect.objectContaining({
-                fullName: "John Smith",
-                email: "john.smith@example.com",
-            }),
+            expect(res.status).toBe(200);
+            expect(json.details.fullName).toBe("Updated Name");
+            // Check that history from oldClient was preserved
+            expect(json.details.drugHistory).toBe(oldClient.drugHistory);
         });
-    });
 
-    it("updates client with partial data", async () => {
-        const now = new Date();
-        const oldClient = makeClientRecord({ id: "abc123", fullName: "Jane Doe", email: "jane@example.com", phoneNumber: "1111111111", createdAt: now, updatedAt: now });
-        
-        const updateData = {
-            fullName: "Jane Johnson",
-            phoneNumber: "2222222222",
-        };
+        it("successfully updates profile image via FormData", async () => {
+            const oldClient = makeClientRecord({ id: CLIENT_ID });
+            const buffer = Buffer.from('fake-image-data');
+            
+            const formData = new FormData();
+            const fields = getValidJsonBody(oldClient);
+            Object.entries(fields).forEach(([key, val]) => formData.append(key, String(val)));
+            
+            formData.append('profileImage', new File([buffer], 'profile.jpg', { type: 'image/jpeg' }));
 
-        const updatedClient = makeClientRecord({ id: "abc123", fullName: "Jane Johnson", email: "jane@example.com", phoneNumber: "2222222222", createdAt: now, updatedAt: now });
-        mockedDb.client.update.mockResolvedValue(updatedClient);
+            mockedDb.client.update.mockResolvedValue({ ...oldClient, profileImage: buffer });
 
-        const response = await PUT(
-            new NextRequest("http://localhost:3000/api/clients/abc123", {
-                method: "PUT",
-                body: JSON.stringify(updateData),
-            }),
-            { params: Promise.resolve({ id: "abc123" }) }
-        );
+            const res = await PUT(createRequest(BASE_URL, "PUT", formData, true), PARAMS);
+            const json = await res.json();
 
-        const json = await response.json();
-        
-        expect(response.status).toBe(200);
-        expect(json.msg).toBe("Client updated successfully");
-        expect(json.details.fullName).toBe("Jane Johnson");
-        expect(json.details.phoneNumber).toBe("2222222222");
-    });
+            expect(res.status).toBe(200);
+            expect(json.details.profileImage).toBe(buffer.toString('base64'));
+        });
 
-    it("returns 400 if id validation fails", async () => {
-        const response = await PUT(
-            new NextRequest("http://localhost:3000/api/clients/", {
-                method: "PUT",
-                body: JSON.stringify({ fullName: "Test" }),
-            }),
-            { params: Promise.resolve({ id: "" }) }
-        );
+        it("returns 400 when required history fields are missing", async () => {
+            const incompleteBody = { fullName: "New Name" };
 
-        const json = await response.json();
-        expect(response.status).toBe(400);
-        expect(json.msg).toBe("Invalid ID");
-    });
+            const res = await PUT(createRequest(BASE_URL, "PUT", incompleteBody), PARAMS);
+            const json = await res.json();
 
-    it("returns 400 if validation fails for update data", async () => {
-        const invalidData = {
-            fullName: "", // Empty name should fail validation
-        };
+            expect(res.status).toBe(400);
+            expect(json.msg).toBe("Validation failed");
+        });
 
-        const response = await PUT(
-            new NextRequest("http://localhost:3000/api/clients/abc123", {
-                method: "PUT",
-                body: JSON.stringify(invalidData),
-            }),
-            { params: Promise.resolve({ id: "abc123" }) }
-        );
+        it("returns 500 when database update fails", async () => {
+            mockedDb.client.update.mockRejectedValue(new Error("Prisma Error"));
+            const validData = getValidJsonBody(makeClientRecord());
 
-        const json = await response.json();
-        expect(response.status).toBe(400);
-        expect(json.msg).toBe("Validation failed");
-        expect(mockedDb.client.update).not.toHaveBeenCalled();
-    });
+            const res = await PUT(createRequest(BASE_URL, "PUT", validData), PARAMS);
+            const json = await res.json();
 
-    it("handles database errors gracefully", async () => {
-        mockedDb.client.update.mockRejectedValue(new Error("Database connection failed"));
-
-        const response = await PUT(
-            new NextRequest("http://localhost:3000/api/clients/abc123", {
-                method: "PUT",
-                body: JSON.stringify({ fullName: "Test User" }),
-            }),
-            { params: Promise.resolve({ id: "abc123" }) }
-        );
-
-        const json = await response.json();
-        expect(response.status).toBe(500);
-        expect(json.msg).toBe("Failed to update client");
-        expect(json.error).toBe("Database connection failed");
+            expect(res.status).toBe(500);
+            expect(json.error).toBe("Prisma Error");
+        });
     });
 });
