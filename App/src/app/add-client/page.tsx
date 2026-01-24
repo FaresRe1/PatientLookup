@@ -1,222 +1,166 @@
 "use client";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { User, Activity, ArrowLeft, Upload, Calendar, Phone, Mail, MapPin, ClipboardList } from "lucide-react";
+import { useAddPatient } from "src/hooks/useAddPatients"
 
 export default function AddClientPage() {
-  const [fullName, setFullName] = useState("");
-  const [gender, setGender] = useState("");
-  const [dob, setDob] = useState("");
-  const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [address, setAddress] = useState("");
-  const [drugHistory, setDrugHistory] = useState("");
-  const [familyHistory, setFamilyHistory] = useState("");
-  const [socialHistory, setSocialHistory] = useState("");
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
   const router = useRouter();
-  const handleSubmit = async (e: React.FormEvent, startNewVisit: boolean = false) => {
+  const { savePatient, isLoading, error } = useAddPatient();
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>, startNewVisit: boolean = false) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
+    
+    const formData = new FormData(e.currentTarget);
+    
+    const result = await savePatient(formData);
 
-    if (!fullName.trim()) {
-      setError("Full Name is required.");
-      return;
-    }
-    if (!drugHistory.trim()) {
-      setError("Drug History (Dh) is required.");
-      return;
-    }
-    if (!familyHistory.trim()) {
-      setError("Family History (Fh) is required.");
-      return;
-    }
-    if (!socialHistory.trim()) {
-      setError("Social History (Sh) is required.");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append('fullName', fullName);
-      formData.append('gender', gender);
-      formData.append('dob', dob);
-      formData.append('drugHistory', drugHistory);
-      formData.append('familyHistory', familyHistory);
-      formData.append('socialHistory', socialHistory);
-      if (email) formData.append('email', email);
-      if (phoneNumber) formData.append('phoneNumber', phoneNumber);
-      if (address) formData.append('address', address);
-      if (profileImage) formData.append('profileImage', profileImage);
-
-      const response = await fetch("/api/clients", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.msg || "Failed to add client.");
-      }
-
-      const responseData = await response.json();
-      const newClientId = responseData.newClient.id;
-
-      setSuccess("Client added successfully!");
-      setFullName("");
-      setGender("")
-      setDob("");
-      setDrugHistory("");
-      setFamilyHistory("");
-      setSocialHistory("");
-      setEmail("");
-      setPhoneNumber("");
-      setAddress("");
-      setProfileImage(null);
-
+    if (result.success) {
       if (startNewVisit) {
-        router.push(`/clients/${newClientId}/new-visit`);
+        router.push(`/clients/${result.id}/new-visit`);
       } else {
         router.push("/");
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
     }
   };
 
   return (
-    <div>
-      <h1>Add New Patient</h1>
-      <form onSubmit={handleSubmit}>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {success && <p style={{ color: 'green' }}>{success}</p>}
-        <div>
-          <label htmlFor="fullName">Full Name (Required):</label>
-          <input
-            id="fullName"
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-          />
+    <div className="max-w-4xl mx-auto space-y-6 pb-20">
+      {/* Header Navigation */}
+      <div className="flex items-center justify-between">
+        <Link 
+          href="/" 
+          className="flex items-center gap-2 text-brand-orange hover:text-brand-dark-orange font-bold transition-colors"
+        >
+          <ArrowLeft size={20} strokeWidth={3} />
+          Back to List
+        </Link>
+      </div>
+
+      {/* Main Form Container */}
+      <div className="bg-white rounded-3xl shadow-clean border border-gray-100 overflow-hidden">
+        <div className="p-8 border-b border-gray-50 bg-orange-50/30">
+          <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
+            <User className="text-brand-orange" size={28} />
+            Add New Patient
+          </h2>
+          <p className="text-gray-500 mt-1 font-medium">Please provide the initial medical and personal details below.</p>
         </div>
-        <div>
-          <label htmlFor="gender">Gender (Required):</label>
-          <select
-            id="gender"
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-            required
-            style={{ padding: '5px', margin: '5px 0' }}
-          >
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="dob">Date of Birth (Required):</label>
-          <input
-            id="dob"
-            type="date"
-            value={dob}
-            onChange={(e) => setDob(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="phoneNumber">Phone Number:</label>
-          <input
-            id="phoneNumber"
-            type="tel"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="address">Address:</label>
-          <input
-            id="address"
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="drugHistory">Dh - Drug History (Required):</label>
-          <textarea
-            id="drugHistory"
-            value={drugHistory}
-            onChange={(e) => setDrugHistory(e.target.value)}
-            required
-            rows={4}
-            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
-          />
-        </div>
-        <div>
-          <label htmlFor="familyHistory">Fh - Family History (Required):</label>
-          <textarea
-            id="familyHistory"
-            value={familyHistory}
-            onChange={(e) => setFamilyHistory(e.target.value)}
-            required
-            rows={4}
-            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
-          />
-        </div>
-        <div>
-          <label htmlFor="socialHistory">Sh - Social History (Required):</label>
-          <textarea
-            id="socialHistory"
-            value={socialHistory}
-            onChange={(e) => setSocialHistory(e.target.value)}
-            required
-            rows={4}
-            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
-          />
-        </div>
-        <div>
-          <label htmlFor="profileImage">Profile Image (Optional, max 5MB):</label>
-          <input
-            id="profileImage"
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0] || null;
-              if (file && file.size > 5 * 1024 * 1024) {
-                alert("Profile image must be smaller than 5MB");
-                e.target.value = "";
-                setProfileImage(null);
-              } else {
-                setProfileImage(file);
-              }
-            }}
-          />
-        </div>
-        <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
-          <button type="submit">Add Patient</button>
-          <button type="button" onClick={(e) => handleSubmit(e, true)} style={{ backgroundColor: '#059669', color: 'white' }}>
-            Add Patient and Start New Visit
-          </button>
-        </div>
-      </form>
-      <br />
-      <button>
-        <Link href="/">Back to Patient List</Link>
-      </button>
-    </div> 
+
+        <form 
+          onSubmit={(e) => handleFormSubmit(e)} 
+          className="p-8 space-y-10"
+        >
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-bold animate-in fade-in zoom-in duration-300">
+              {error}
+            </div>
+          )}
+
+          {/* Personal Details Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <FormGroup label="Full Name *" icon={<User size={18} />}>
+              <input name="fullName" type="text" required placeholder="John Smith" className="form-input-styled" />
+            </FormGroup>
+
+            <FormGroup label="Date of Birth *" icon={<Calendar size={18} />}>
+              <input name="dob" type="date" required className="form-input-styled" />
+            </FormGroup>
+
+            <FormGroup label="Gender *" icon={<Activity size={18} />}>
+              <select name="gender" required className="form-input-styled appearance-none cursor-pointer">
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </FormGroup>
+
+            <FormGroup label="Phone Number" icon={<Phone size={18} />}>
+              <input name="phoneNumber" type="tel" placeholder="+44 " className="form-input-styled" />
+            </FormGroup>
+
+            <FormGroup label="Email Address" icon={<Mail size={18} />}>
+              <input name="email" type="email" placeholder="user@example.com" className="form-input-styled" />
+            </FormGroup>
+
+            <FormGroup label="Address" icon={<MapPin size={18} />}>
+              <input name="address" type="text" placeholder="123 Medical St" className="form-input-styled" />
+            </FormGroup>
+          </div>
+
+          {/* Medical History Section */}
+          <div className="space-y-6 pt-6 border-t border-gray-50">
+            <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <ClipboardList size={16} className="text-brand-orange" />
+              Required Medical History
+            </h3>
+            
+            <FormGroup label="Dh - Drug History *">
+              <textarea name="drugHistory" rows={3} required placeholder="List current medications and allergies..." className="form-input-styled py-3" />
+            </FormGroup>
+
+            <FormGroup label="Fh - Family History *">
+              <textarea name="familyHistory" rows={3} required placeholder="Note any relevant hereditary conditions..." className="form-input-styled py-3" />
+            </FormGroup>
+
+            <FormGroup label="Sh - Social History *">
+              <textarea name="socialHistory" rows={3} required placeholder="Smoking, exercise, occupation, etc..." className="form-input-styled py-3" />
+            </FormGroup>
+          </div>
+
+          {/* File Upload */}
+          <div className="pt-6 border-t border-gray-50">
+            <label className="text-sm font-bold text-gray-700 mb-3 block">Profile Image (Optional)</label>
+            <div className="relative group">
+              <input
+                type="file"
+                name="profileImage"
+                accept="image/*"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              />
+              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-10 text-center bg-gray-50 group-hover:bg-orange-50 group-hover:border-brand-orange/30 transition-all">
+                <Upload className="mx-auto text-brand-orange mb-2" size={32} />
+                <p className="text-gray-800 font-bold">Click to upload photo</p>
+                <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest font-bold">Max size 5MB</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col md:flex-row gap-4 pt-10">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="flex-2 bg-brand-orange hover:bg-brand-dark-orange text-white py-4 rounded-2xl font-black shadow-lg shadow-orange-500/20 transition-all active:scale-95 disabled:opacity-50"
+            >
+              {isLoading ? "Saving..." : "ADD PATIENT"}
+            </button>
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={(e) => {
+                const form = e.currentTarget.closest('form');
+                if (form) handleFormSubmit({ preventDefault: () => {}, currentTarget: form } as any, true);
+              }}
+              className="flex-2 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50"
+            >
+              ADD & START VISIT
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function FormGroup({ label, icon, children }: { label: string, icon?: React.ReactNode, children: React.ReactNode }) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-bold text-gray-700 ml-1">{label}</label>
+      <div className="relative">
+        {icon && <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>}
+        {children}
+      </div>
+    </div>
   );
 }
