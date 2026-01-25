@@ -1,16 +1,29 @@
 "use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User, Activity, ArrowLeft, Upload, Calendar, Phone, Mail, MapPin, ClipboardList } from "lucide-react";
-import { useAddPatient } from "src/hooks/useAddPatients"
+import { User, Activity, ArrowLeft, Upload, Calendar, Phone, Mail, MapPin, ClipboardList, Loader2 } from "lucide-react";
+import { useAddPatient } from "src/hooks/useAddPatients";
 
 export default function AddClientPage() {
   const router = useRouter();
   const { savePatient, isLoading, error } = useAddPatient();
 
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>, startNewVisit: boolean = false) => {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
+    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
+    const startNewVisit = submitter?.getAttribute("data-start-visit") === "true";
+
     const formData = new FormData(e.currentTarget);
     
     const result = await savePatient(formData);
@@ -25,7 +38,7 @@ export default function AddClientPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-20">
+    <div className="max-w-4xl mx-auto space-y-6 pb-20 animate-in fade-in duration-500">
       {/* Header Navigation */}
       <div className="flex items-center justify-between">
         <Link 
@@ -47,12 +60,9 @@ export default function AddClientPage() {
           <p className="text-gray-500 mt-1 font-medium">Please provide the initial medical and personal details below.</p>
         </div>
 
-        <form 
-          onSubmit={(e) => handleFormSubmit(e)} 
-          className="p-8 space-y-10"
-        >
+        <form onSubmit={handleFormSubmit} className="p-8 space-y-10">
           {error && (
-            <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-bold animate-in fade-in zoom-in duration-300">
+            <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-bold animate-in slide-in-from-top-2">
               {error}
             </div>
           )}
@@ -72,6 +82,7 @@ export default function AddClientPage() {
                 <option value="">Select gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
+                <option value="Other">Other</option>
               </select>
             </FormGroup>
 
@@ -108,7 +119,7 @@ export default function AddClientPage() {
             </FormGroup>
           </div>
 
-          {/* File Upload */}
+          {/* File Upload with Preview */}
           <div className="pt-6 border-t border-gray-50">
             <label className="text-sm font-bold text-gray-700 mb-3 block">Profile Image (Optional)</label>
             <div className="relative group">
@@ -116,12 +127,26 @@ export default function AddClientPage() {
                 type="file"
                 name="profileImage"
                 accept="image/*"
+                onChange={handleFileChange}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
-              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-10 text-center bg-gray-50 group-hover:bg-orange-50 group-hover:border-brand-orange/30 transition-all">
-                <Upload className="mx-auto text-brand-orange mb-2" size={32} />
-                <p className="text-gray-800 font-bold">Click to upload photo</p>
-                <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest font-bold">Max size 5MB</p>
+              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-10 text-center bg-gray-50 group-hover:bg-orange-50 group-hover:border-brand-orange/30 transition-all flex flex-col items-center justify-center min-h-[200px] overflow-hidden">
+                {previewUrl ? (
+                  <div className="animate-in zoom-in duration-300">
+                    <img 
+                      src={previewUrl} 
+                      alt="Preview" 
+                      className="h-32 w-32 object-cover rounded-2xl shadow-md border-2 border-white mb-2" 
+                    />
+                    <p className="text-brand-orange font-bold text-xs uppercase tracking-widest">Click to change photo</p>
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="mx-auto text-brand-orange mb-2" size={32} />
+                    <p className="text-gray-800 font-bold">Click to upload photo</p>
+                    <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest font-bold">Max size 5MB</p>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -131,18 +156,16 @@ export default function AddClientPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-2 bg-brand-orange hover:bg-brand-dark-orange text-white py-4 rounded-2xl font-black shadow-lg shadow-orange-500/20 transition-all active:scale-95 disabled:opacity-50"
+              className="flex-1 bg-brand-orange hover:bg-brand-dark-orange text-white py-4 rounded-2xl font-black shadow-lg shadow-orange-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {isLoading ? "Saving..." : "ADD PATIENT"}
+              {isLoading && <Loader2 className="animate-spin" size={20} />}
+              {isLoading ? "SAVING..." : "ADD PATIENT"}
             </button>
             <button
-              type="button"
+              type="submit"
+              data-start-visit="true"
               disabled={isLoading}
-              onClick={(e) => {
-                const form = e.currentTarget.closest('form');
-                if (form) handleFormSubmit({ preventDefault: () => {}, currentTarget: form } as any, true);
-              }}
-              className="flex-2 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50"
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50"
             >
               ADD & START VISIT
             </button>
