@@ -1,16 +1,17 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { 
+  User, Activity, ArrowLeft, Calendar, ClipboardList, Edit3, Save, X, Plus, 
+  Download, Eye, FileText, Camera, Loader2
+} from "lucide-react";
 
-export const dynamic = 'force-dynamic';
-
+import { useUpdatePatient } from "~/hooks/useUpdatePatient";
 import type { ClientJSONType } from "~/models/client";
 import type { AttachmentType } from "~/models/attachment";
 
 type Client = ClientJSONType; 
-
 type Visit = {
     id: string;
     visitDate: string;
@@ -25,64 +26,51 @@ type Visit = {
 };
 
 export default function ClientDetails() {
-    const params = useParams();
-    const { id } = params;
+    const { id } = useParams();
+    const router = useRouter();
 
     const [client, setClient] = useState<Client | null>(null);
     const [visits, setVisits] = useState<Visit[]>([]);
-    
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState<Partial<Client>>({});
-    const [isSaving, setIsSaving] = useState(false);
-
-    const [selectedImage, setSelectedImage] = useState<{ id: string; fileName: string; data: Blob } | null>(null);
     const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
+    
+    const [selectedImage, setSelectedImage] = useState<{ id: string; fileName: string; data: Blob } | null>(null);
+
+    const { updatePatient, isSaving, updateError } = useUpdatePatient(id as string);
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
-            setError(null);
             try {
+                // Fetch Client Details
                 const res = await fetch(`/api/clients/${id}`);
-                if (!res.ok) throw new Error("Failed to load client.");
+                if (!res.ok) throw new Error("Failed to load patient data.");
                 const data = await res.json();
-                
                 const loadedClient = data.details || data; 
                 setClient(loadedClient);
-                setFormData(loadedClient); // Pre-fill edit form
+                setFormData(loadedClient);
 
-                try {
-                    const resVisits = await fetch(`/api/visits?clientId=${id}`);
-                    if (resVisits.ok) {
-                        const visitData = await resVisits.json();
-                        
-                        // Fetch attachments for each visit
-                        const visitsWithAttachments = await Promise.all(
-                            visitData.map(async (visit: Visit) => {
-                                try {
-                                    const attachRes = await fetch(`/api/attachments?visitId=${visit.id}`);
-                                    if (attachRes.ok) {
-                                        const attachments = await attachRes.json();
-                                        return { ...visit, attachments };
-                                    }
-                                } catch (e) {
-                                    console.error(`Failed to load attachments for visit ${visit.id}`);
-                                }
-                                return visit;
-                            })
-                        );
-                        
-                        setVisits(visitsWithAttachments);
-                    }
-                } catch (e) {
-                    console.log("No visits found or API not ready");
+                // Fetch Visits
+                const resVisits = await fetch(`/api/visits?clientId=${id}`);
+                if (resVisits.ok) {
+                    const visitData = await resVisits.json();
+                    
+                    // Fetch attachments for each visit
+                    const visitsWithAttachments = await Promise.all(
+                        visitData.map(async (visit: Visit) => {
+                            const attachRes = await fetch(`/api/attachments?visitId=${visit.id}`);
+                            const attachments = attachRes.ok ? await attachRes.json() : [];
+                            return { ...visit, attachments };
+                        })
+                    );
+                    setVisits(visitsWithAttachments);
                 }
-
             } catch (err: any) {
-                setError(err.message);
+                setFetchError(err.message);
             } finally {
                 setIsLoading(false);
             }
@@ -90,71 +78,7 @@ export default function ClientDetails() {
         fetchData();
     }, [id]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
-
-    const handleSave = async () => {
-        setIsSaving(true);
-        try {
-            let res: Response;
-            
-            if (newProfileImage) {
-                const formDataToSend = new FormData();
-                // Only include updateable fields
-                const updateableFields = ['fullName', 'gender', 'dob', 'email', 'phoneNumber', 'address', 'drugHistory', 'familyHistory', 'socialHistory'];
-                updateableFields.forEach(key => {
-                    const value = formData[key as keyof typeof formData];
-                    if (value !== null && value !== undefined) {
-                        formDataToSend.append(key, value.toString());
-                    }
-                });
-                formDataToSend.append('profileImage', newProfileImage);
-                
-                res = await fetch(`/api/clients/${id}`, {
-                    method: "PUT",
-                    body: formDataToSend,
-                });
-            } else {
-                const updateData = {
-                    fullName: formData.fullName,
-                    gender: formData.gender,
-                    dob: formData.dob,
-                    email: formData.email,
-                    phoneNumber: formData.phoneNumber,
-                    address: formData.address,
-                    drugHistory: formData.drugHistory,
-                    familyHistory: formData.familyHistory,
-                    socialHistory: formData.socialHistory,
-                };
-                
-                res = await fetch(`/api/clients/${id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(updateData),
-                });
-            }
-
-            if (!res.ok) throw new Error("Failed to update.");
-            
-            const responseData = await res.json();
-            setClient(responseData.details);
-            setIsEditing(false);
-            setNewProfileImage(null);
-        } catch (err: any) {
-            alert(err.message);
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const isImageFile = (fileType: string) => {
-        return fileType.startsWith("image/");
-    };
-
+    // File Handling
     const handleViewImage = async (attachmentId: string, fileName: string) => {
         try {
             const res = await fetch(`/api/attachments/${attachmentId}`);
@@ -169,18 +93,15 @@ export default function ClientDetails() {
     const handleDownloadFile = async (attachmentId: string, fileName: string) => {
         try {
             const res = await fetch(`/api/attachments/${attachmentId}`);
-            if (!res.ok) throw new Error("Failed to download file");
             const blob = await res.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
             a.download = fileName;
-            document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } catch (err: any) {
-            alert(err.message || "Failed to download file");
+        } catch (err) {
+            alert("Download failed");
         }
     };
 
@@ -192,326 +113,230 @@ export default function ClientDetails() {
         return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
     };
 
-    if (isLoading) return <p>Loading...</p>;
-    if (error) return <p style={{ color: "red" }}>{error}</p>;
-    if (!client) return <p>Client not found.</p>;
+    const handleSaveAction = async () => {
+        const result = await updatePatient(formData, newProfileImage);
+        if (result.success) {
+            setClient(result.details);
+            setIsEditing(false);
+            setNewProfileImage(null);
+        }
+    };
+
+    if (isLoading) return <div className="flex justify-center p-20"><Activity className="animate-spin text-brand-orange" size={48} /></div>;
 
     return (
-        <main style={{ padding: '20px' }}>
-            {/* Top Navigation */}
-            <div style={{ marginBottom: '20px' }}>
-                <button>
-                    <Link href="/">Back to List</Link>
-                </button>
-            </div>
-
-            {/* Header with Edit Toggle */}
-            <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                <h1>{client.fullName}</h1>
-                <button onClick={() => isEditing ? handleSave() : setIsEditing(true)} disabled={isSaving}>
-                    {isSaving ? "Saving..." : (isEditing ? "Save Changes" : "Edit Patient")}
-                </button>
-                {isEditing && (
-                    <button onClick={() => { setIsEditing(false); setFormData(client); setNewProfileImage(null); }}>
-                        Cancel
+        <div className="max-w-6xl mx-auto space-y-10 pb-20 animate-in fade-in duration-500">
+            {/* Top Navigation Bar */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <Link href="/" className="flex items-center gap-2 text-brand-orange font-bold hover:underline">
+                    <ArrowLeft size={20} strokeWidth={3} />
+                    Back to Patient List
+                </Link>
+                <div className="flex gap-3">
+                    <button 
+                        onClick={() => isEditing ? handleSaveAction() : setIsEditing(true)}
+                        disabled={isSaving}
+                        className="flex items-center gap-2 bg-white border-2 border-brand-orange text-brand-orange px-5 py-2.5 rounded-xl font-bold hover:bg-orange-50 transition-all shadow-sm"
+                    >
+                        {isSaving ? <Loader2 className="animate-spin" size={18} /> : (isEditing ? <Save size={18} /> : <Edit3 size={18} />)}
+                        {isSaving ? "Saving..." : (isEditing ? "Save Changes" : "Edit Profile")}
                     </button>
-                )}
+                    {isEditing && (
+                        <button onClick={() => { setIsEditing(false); setFormData(client!); }} className="px-5 py-2.5 bg-gray-100 rounded-xl font-bold text-gray-600">
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </div>
 
-            {/* Profile Image */}
-            <div style={{ margin: '20px 0' }}>
-                {isEditing ? (
-                    <div>
-                        <div style={{ marginBottom: '10px' }}>
-                            <strong>Current Profile Image:</strong>
-                        </div>
-                        {client.profileImage ? (
-                            <img src={`data:image/jpeg;base64,${client.profileImage}`} alt="Profile" style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '8px', marginBottom: '10px' }} />
-                        ) : (
-                            <div style={{
-                                width: '100px',
-                                height: '100px',
-                                backgroundColor: '#e5e7eb',
-                                borderRadius: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                border: '2px solid #d1d5db',
-                                marginBottom: '10px'
-                            }}>
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="12" cy="8" r="3" fill="#9ca3af"/>
-                                    <path d="M12 14c-4 0-7 2-7 4v1h14v-1c0-2-3-4-7-4z" fill="#9ca3af"/>
-                                </svg>
-                            </div>
-                        )}
-                        <div>
-                            <label htmlFor="profileImageEdit"><strong>Change Profile Image (optional, max 5MB):</strong></label>
-                            <input
-                                id="profileImageEdit"
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0] || null;
-                                    if (file && file.size > 5 * 1024 * 1024) {
-                                        alert("Profile image must be smaller than 5MB");
-                                        e.target.value = "";
-                                        setNewProfileImage(null);
-                                    } else {
-                                        setNewProfileImage(file);
-                                    }
-                                }}
-                                style={{ display: 'block', marginTop: '5px' }}
-                            />
-                            {newProfileImage && (
-                                <div style={{ marginTop: '5px', fontSize: '14px', color: '#059669' }}>
-                                    New image selected: {newProfileImage.name}
+            {/* Profile Header Card */}
+            <div className="bg-white rounded-[2.5rem] shadow-clean border border-gray-100 p-8 md:p-12">
+                <div className="flex flex-col md:flex-row gap-12">
+                    <div className="flex flex-col items-center space-y-4">
+                        <div className="relative group">
+                            {isEditing ? (
+                                <label className="cursor-pointer">
+                                    <input type="file" className="hidden" onChange={(e) => setNewProfileImage(e.target.files?.[0] || null)} />
+                                    <div className="w-44 h-44 bg-gray-50 rounded-3xl border-2 border-dashed border-brand-orange/30 flex flex-col items-center justify-center text-brand-orange">
+                                        <Camera size={32} />
+                                        <span className="text-xs font-black mt-2 uppercase tracking-tighter">Change Photo</span>
+                                    </div>
+                                </label>
+                            ) : (
+                                <div className="w-44 h-44 rounded-3xl overflow-hidden shadow-lg border-4 border-white">
+                                    {client?.profileImage ? (
+                                        <img src={`data:image/jpeg;base64,${client.profileImage}`} className="w-full h-full object-cover" alt="Profile" />
+                                    ) : (
+                                        <div className="w-full h-full bg-orange-100 flex items-center justify-center"><User size={64} className="text-brand-orange" /></div>
+                                    )}
                                 </div>
                             )}
                         </div>
+                        <span className="bg-orange-100 text-brand-dark-orange text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest">ID: #{client?.id}</span>
                     </div>
-                ) : (
-                    client.profileImage ? (
-                        <img src={`data:image/jpeg;base64,${client.profileImage}`} alt="Profile" style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '8px' }} />
-                    ) : (
-                        <div style={{
-                            width: '100px',
-                            height: '100px',
-                            backgroundColor: '#e5e7eb',
-                            borderRadius: '8px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            border: '2px solid #d1d5db'
-                        }}>
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="8" r="3" fill="#9ca3af"/>
-                                <path d="M12 14c-4 0-7 2-7 4v1h14v-1c0-2-3-4-7-4z" fill="#9ca3af"/>
-                            </svg>
-                        </div>
-                    )
-                )}
-            </div>
 
-            {/* Client Details / Edit Form */}
-            <div style={{ margin: '20px 0' }}>
-                <p>
-                    <strong>ID:</strong> {client.id}
-                </p>
-
-                <div style={{ marginBottom: '10px' }}>
-                    <strong>Full Name: </strong>
-                    {isEditing ? (
-                        <input name="fullName" value={formData.fullName || ""} onChange={handleInputChange} />
-                    ) : (
-                        <span>{client.fullName}</span>
-                    )}
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <strong>Gender: </strong>
-                    {isEditing ? (
-                        <select name="gender" value={formData.gender || ""} onChange={handleInputChange} style={{ padding: '5px' }}>
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                        </select>
-                    ) : (
-                        <span>{client.gender}</span>
-                    )}
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <strong>DOB: </strong>
-                    {isEditing ? (
-                        <input type="date" name="dob" value={formData.dob ? new Date(formData.dob).toISOString().split('T')[0] : ""} onChange={handleInputChange} />
-                    ) : (
-                        <span>{client.dob ? new Date(client.dob).toLocaleDateString() : "N/A"}</span>
-                    )}
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                        <DetailItem label="Full Name" name="fullName" value={client?.fullName} editValue={formData.fullName} isEditing={isEditing} onChange={setFormData} />
+                        <DetailItem label="Gender" name="gender" value={client?.gender} editValue={formData.gender} isEditing={isEditing} onChange={setFormData} type="select" options={["Male", "Female", "Other"]} />
+                        <DetailItem label="Date of Birth" name="dob" value={client?.dob ? new Date(client.dob).toLocaleDateString() : "N/A"} editValue={formData.dob} isEditing={isEditing} onChange={setFormData} type="date" />
+                        <DetailItem label="Phone" name="phoneNumber" value={client?.phoneNumber} editValue={formData.phoneNumber} isEditing={isEditing} onChange={setFormData} />
+                        <DetailItem label="Email" name="email" value={client?.email} editValue={formData.email} isEditing={isEditing} onChange={setFormData} />
+                        <DetailItem label="Address" name="address" value={client?.address} editValue={formData.address} isEditing={isEditing} onChange={setFormData} />
+                    </div>
                 </div>
 
-                <div style={{ marginBottom: '10px' }}>
-                    <strong>Email: </strong>
-                    {isEditing ? (
-                        <input name="email" value={formData.email || ""} onChange={handleInputChange} />
-                    ) : (
-                        <span>{client.email || "N/A"}</span>
-                    )}
-                </div>
-
-                <div style={{ marginBottom: '10px' }}>
-                    <strong>Phone: </strong>
-                    {isEditing ? (
-                        <input name="phoneNumber" value={formData.phoneNumber || ""} onChange={handleInputChange} />
-                    ) : (
-                        <span>{client.phoneNumber || "N/A"}</span>
-                    )}
-                </div>
-
-                <div style={{ marginBottom: '10px' }}>
-                    <strong>Address: </strong>
-                    {isEditing ? (
-                        <input name="address" value={formData.address || ""} onChange={handleInputChange} />
-                    ) : (
-                        <span>{client.address || "N/A"}</span>
-                    )}
-                </div>
-
-                <div style={{ marginBottom: '10px' }}>
-                    <strong>Dh - Drug History: </strong>
-                    {isEditing ? (
-                        <textarea
-                            name="drugHistory"
-                            value={formData.drugHistory || ""}
-                            onChange={handleInputChange}
-                            rows={4}
-                            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
-                        />
-                    ) : (
-                        <span>{client.drugHistory || "NA"}</span>
-                    )}
-                </div>
-
-                <div style={{ marginBottom: '10px' }}>
-                    <strong>Fh - Family History: </strong>
-                    {isEditing ? (
-                        <textarea
-                            name="familyHistory"
-                            value={formData.familyHistory || ""}
-                            onChange={handleInputChange}
-                            rows={4}
-                            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
-                        />
-                    ) : (
-                        <span>{client.familyHistory || "NA"}</span>
-                    )}
-                </div>
-
-                <div style={{ marginBottom: '10px' }}>
-                    <strong>Sh - Social History: </strong>
-                    {isEditing ? (
-                        <textarea
-                            name="socialHistory"
-                            value={formData.socialHistory || ""}
-                            onChange={handleInputChange}
-                            rows={4}
-                            style={{ width: '100%', padding: '5px', margin: '5px 0' }}
-                        />
-                    ) : (
-                        <span>{client.socialHistory || "NA"}</span>
-                    )}
+                <div className="mt-14 pt-12 border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <HistoryItem label="Drug History (Dh)" name="drugHistory" value={client?.drugHistory} editValue={formData.drugHistory} isEditing={isEditing} onChange={setFormData} />
+                    <HistoryItem label="Family History (Fh)" name="familyHistory" value={client?.familyHistory} editValue={formData.familyHistory} isEditing={isEditing} onChange={setFormData} />
+                    <HistoryItem label="Social History (Sh)" name="socialHistory" value={client?.socialHistory} editValue={formData.socialHistory} isEditing={isEditing} onChange={setFormData} />
                 </div>
             </div>
 
-            <hr />
-
-            {/* Visits Section */}
-            <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h2>Medical Visits</h2>
-                    <button style={{ backgroundColor: '#e0ffe0' }}>
-                        <Link href={`/clients/${id}/new-visit`}>+ Add New Visit Report</Link>
-                    </button>
+            {/* Visit History Section */}
+            <div className="space-y-6 pt-6">
+                <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-black text-gray-800 flex items-center gap-3">
+                        <ClipboardList className="text-brand-orange" size={28} />
+                        Medical Visit History
+                    </h2>
+                    {!isEditing && (
+                        <Link href={`/clients/${id}/new-visit`} className="bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:bg-emerald-700 transition-all shadow-md">
+                            <Plus size={18} strokeWidth={3} /> New Visit Report
+                        </Link>
+                    )}
                 </div>
-
+                
                 {visits.length === 0 ? (
-                    <p>No visits recorded.</p>
+                    <div className="bg-white p-16 rounded-3xl text-center border-2 border-dashed border-gray-100 text-gray-400 font-bold">No clinical visits recorded yet.</div>
                 ) : (
-                    <ul>
+                    <div className="grid gap-8">
                         {visits.map((visit) => (
-                            <li key={visit.id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 0' }}>
-                                <p><strong>Date:</strong> {new Date(visit.visitDate).toLocaleDateString()}</p>
-                                <p><strong>Doctor:</strong> {visit.doctorName}</p>
-                                <p><strong>pc - Presenting Complaint:</strong> {visit.presentingComplaint}</p>
-                                <p><strong>hpc - History of Presenting Complaint:</strong> {visit.historyOfPresentingComplaint} </p>
-                                <p><strong>oe - Observation and Examination:</strong> {visit.observationAndExamination} </p>
-                                <p><strong>Impression:</strong> {visit.impression} </p>
-                                <p><strong>Plan:</strong> {visit.plan} </p>
-                                <p><strong>Notes:</strong> {visit.notes} </p>
-                                
+                            <div key={visit.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all">
+                                {/* Visit Card Header */}
+                                <div className="flex flex-col md:flex-row justify-between mb-8 pb-8 border-b border-gray-50 gap-6">
+                                    <div className="flex items-center gap-5">
+                                        <div className="bg-orange-50 p-4 rounded-2xl text-brand-orange shadow-sm"><Calendar size={28} /></div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Visit Date</p>
+                                            <p className="text-xl font-bold text-gray-800">{new Date(visit.visitDate).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Consulting Clinician</p>
+                                        <p className="text-xl font-bold text-gray-800">{visit.doctorName}</p>
+                                    </div>
+                                </div>
+
+                                {/* Detailed Medical Fields */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                                    <VisitDetail label="pc - Presenting Complaint" value={visit.presentingComplaint} />
+                                    <VisitDetail label="oe - Observation & Exam" value={visit.observationAndExamination} />
+                                    <VisitDetail label="hpc - History of Presenting Complaint" value={visit.historyOfPresentingComplaint} />
+                                    <VisitDetail label="Clinical Impression" value={visit.impression} />
+                                    <VisitDetail label="Management Plan" value={visit.plan} />
+                                    <VisitDetail label="Internal Notes" value={visit.notes} />
+                                </div>
+
+                                {/* Original Functionality: Attachments */}
                                 {visit.attachments && visit.attachments.length > 0 && (
-                                    <div style={{ marginTop: '10px' }}>
-                                        <p><strong>Attachments:</strong></p>
-                                        <div style={{ marginLeft: '20px' }}>
+                                    <div className="mt-10 pt-8 border-t border-gray-50">
+                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Attached Documents & Images</p>
+                                        <div className="flex flex-wrap gap-4">
                                             {visit.attachments.map((att) => (
-                                                <div key={att.id} style={{ marginBottom: '8px', fontSize: '14px' }}>
-                                                    <span>{att.fileName} ({formatFileSize(att.fileSize)})</span>
-                                                    {isImageFile(att.fileType) ? (
+                                                <div key={att.id} className="flex items-center gap-4 bg-gray-50 border border-gray-100 p-3.5 rounded-2xl">
+                                                    <FileText size={20} className="text-brand-orange" />
+                                                    <div>
+                                                        <p className="text-sm font-bold text-gray-700 leading-none">{att.fileName}</p>
+                                                        <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold">{formatFileSize(att.fileSize)}</p>
+                                                    </div>
+                                                    <div className="flex gap-2 ml-4">
+                                                        {att.fileType.startsWith("image/") && (
+                                                            <button 
+                                                                onClick={() => handleViewImage(att.id, att.fileName)} 
+                                                                className="p-2.5 bg-white rounded-xl text-brand-orange hover:bg-orange-100 shadow-sm transition-all"
+                                                                title="View Image"
+                                                            >
+                                                                <Eye size={18}/>
+                                                            </button>
+                                                        )}
                                                         <button 
-                                                            onClick={() => handleViewImage(att.id, att.fileName)}
-                                                            style={{ marginLeft: '10px', padding: '2px 8px', fontSize: '12px' }}
+                                                            onClick={() => handleDownloadFile(att.id, att.fileName)} 
+                                                            className="p-2.5 bg-white rounded-xl text-gray-600 hover:bg-gray-100 shadow-sm transition-all"
+                                                            title="Download File"
                                                         >
-                                                            View
+                                                            <Download size={18}/>
                                                         </button>
-                                                    ) : (
-                                                        <button 
-                                                            onClick={() => handleDownloadFile(att.id, att.fileName)}
-                                                            style={{ marginLeft: '10px', padding: '2px 8px', fontSize: '12px' }}
-                                                        >
-                                                            Download
-                                                        </button>
-                                                    )}
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
                                 )}
-                            </li>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 )}
             </div>
 
-            {/* Image Preview Modal */}
+            {/* Original Functionality: Image Modal */}
             {selectedImage && (
-                <div 
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000
-                    }}
-                    onClick={() => setSelectedImage(null)}
-                >
-                    <div 
-                        style={{
-                            backgroundColor: 'white',
-                            padding: '20px',
-                            borderRadius: '8px',
-                            maxWidth: '90%',
-                            maxHeight: '90%',
-                            overflow: 'auto',
-                            position: 'relative'
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button 
-                            onClick={() => setSelectedImage(null)}
-                            style={{
-                                position: 'absolute',
-                                top: '10px',
-                                right: '10px',
-                                padding: '5px 10px',
-                                fontSize: '16px'
-                            }}
-                        >
-                            ✕
-                        </button>
-                        <p style={{ marginTop: '30px', marginBottom: '10px', fontWeight: 'bold' }}>
-                            {selectedImage.fileName}
-                        </p>
+                <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-6 sm:p-20 animate-in fade-in duration-300" onClick={() => setSelectedImage(null)}>
+                    <button className="absolute top-10 right-10 text-white hover:text-brand-orange transition-colors"><X size={48}/></button>
+                    <div className="bg-white p-2 rounded-3xl shadow-2xl max-w-full max-h-full overflow-hidden" onClick={e => e.stopPropagation()}>
                         <img 
-                            src={URL.createObjectURL(selectedImage.data)}
-                            alt={selectedImage.fileName}
-                            style={{ maxWidth: '100%', maxHeight: '100%' }}
+                            src={URL.createObjectURL(selectedImage.data)} 
+                            alt="Preview" 
+                            className="max-w-full max-h-[80vh] rounded-2xl" 
                         />
+                        <div className="p-4 text-center">
+                            <p className="font-bold text-gray-800">{selectedImage.fileName}</p>
+                        </div>
                     </div>
                 </div>
             )}
-        </main>
+        </div>
+    );
+}
+
+function DetailItem({ label, name, value, editValue, isEditing, onChange, type = "text", options = [] }: any) {
+    return (
+        <div className="space-y-2">
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{label}</p>
+            {isEditing ? (
+                type === "select" ? (
+                    <select value={editValue || ""} onChange={(e) => onChange((prev: any) => ({ ...prev, [name]: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-4 focus:ring-orange-100 outline-none transition-all font-semibold">
+                        <option value="">Select...</option>
+                        {options.map((o: string) => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                ) : (
+                    <input type={type} value={type === "date" && editValue ? new Date(editValue).toISOString().split('T')[0] : (editValue || "")} onChange={(e) => onChange((prev: any) => ({ ...prev, [name]: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-4 focus:ring-orange-100 outline-none transition-all font-semibold" />
+                )
+            ) : (
+                <p className="text-lg font-bold text-gray-800 leading-tight">{value || "—"}</p>
+            )}
+        </div>
+    );
+}
+
+function HistoryItem({ label, name, value, editValue, isEditing, onChange }: any) {
+    return (
+        <div className="bg-orange-50/40 p-8 rounded-[2rem] border border-orange-100/60">
+            <p className="text-[10px] font-black text-brand-dark-orange uppercase tracking-[0.2em] mb-4">{label}</p>
+            {isEditing ? (
+                <textarea value={editValue || ""} onChange={(e) => onChange((prev: any) => ({ ...prev, [name]: e.target.value }))} className="w-full bg-white border border-orange-200 p-4 rounded-2xl focus:ring-4 focus:ring-orange-100 outline-none min-h-[140px] font-medium" />
+            ) : (
+                <p className="text-gray-700 leading-relaxed font-semibold">{value || "No records provided."}</p>
+            )}
+        </div>
+    );
+}
+
+function VisitDetail({ label, value }: { label: string, value?: string }) {
+    if (!value) return null;
+    return (
+        <div className="space-y-1.5">
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{label}</p>
+            <p className="text-gray-700 font-semibold leading-relaxed text-sm lg:text-base">{value}</p>
+        </div>
     );
 }
