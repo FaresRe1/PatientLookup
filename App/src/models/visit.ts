@@ -9,6 +9,11 @@ export const VisitBase = z.object({
   impression: z.string().optional().nullable(),
   plan: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
+
+  medicalFocusQuestionnaire: z.unknown().optional().nullable(),
+  sandstormQuestionnaire: z.unknown().optional().nullable(),
+  radiationQuestionnaire: z.unknown().optional().nullable(),
+
   visitDate: z.preprocess((v) => {
     if (typeof v === "string" && v) return new Date(v as string);
     if (v instanceof Date) return v;
@@ -20,7 +25,7 @@ export const VisitBase = z.object({
         templateId: z.string(),
         templateName: z.string(),
         answers: z.record(z.any()),
-      })
+      }),
     )
     .optional(),
 });
@@ -29,8 +34,14 @@ export const VisitCreate = VisitBase;
 
 export const VisitResponse = z.object({
   id: z.string(),
-  createdAt: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.string()),
-  visitDate: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.string()),
+  createdAt: z.preprocess(
+    (v) => (v instanceof Date ? v.toISOString() : v),
+    z.string(),
+  ),
+  visitDate: z.preprocess(
+    (v) => (v instanceof Date ? v.toISOString() : v),
+    z.string(),
+  ),
   doctorName: z.string(),
   presentingComplaint: z.string().nullable().optional(),
   historyOfPresentingComplaint: z.string().nullable().optional(),
@@ -38,6 +49,9 @@ export const VisitResponse = z.object({
   impression: z.string().nullable().optional(),
   plan: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
+  medicalFocusQuestionnaire: z.unknown().optional().nullable(),
+  sandstormQuestionnaire: z.unknown().optional().nullable(),
+  radiationQuestionnaire: z.unknown().optional().nullable(),
   clientId: z.string(),
   forms: z
     .array(
@@ -45,7 +59,7 @@ export const VisitResponse = z.object({
         templateId: z.string(),
         templateName: z.string(),
         answers: z.record(z.any()),
-      })
+      }),
     )
     .optional(),
 });

@@ -45,6 +45,11 @@ model Visit {
   plan                         String @default("")
   notes                        String?  
   
+  // For Questionnaires. Not ideal but works for last minute implementation.
+  medicalFocusQuestionnaire Json?
+  sandstormQuestionnaire    Json?
+  radiationQuestionnaire    Json? 
+
   clientId     String
   client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   
