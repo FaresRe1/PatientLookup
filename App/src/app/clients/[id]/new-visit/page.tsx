@@ -1,11 +1,11 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-
 import MedicalQuestionnaire from "../../../../components/questionnaires/MedicalQuestionnaire";
 import RadiationQuestionnaire from "../../../../components/questionnaires/RadiationQuestionnaire";
 import SandstormQuestionnaire from "../../../../components/questionnaires/SandstormQuestionnaire";
-
+import CollapsibleSection from "~/components/CollapsibleSection";
 import Link from "next/link";
 import {
   User,
@@ -20,13 +20,29 @@ import {
   ClipboardCheck,
   Stethoscope,
   MessageSquare,
+  BookOpen,
 } from "lucide-react";
-
 import type { ClientJSONType } from "~/models/client";
 import type { AttachmentType } from "~/models/attachment";
-import { Doc } from "zod/v4/core";
 
 type Client = Pick<ClientJSONType, "id" | "fullName" | "gender" | "dob">;
+
+interface Template {
+  id: string;
+  title: string;
+  content: string;
+}
+
+const ORANGE = "#f97316";
+
+const BUTTON_STYLE = {
+  padding: "8px 16px",
+  backgroundColor: ORANGE,
+  color: "white",
+  border: "none",
+  borderRadius: "4px",
+  cursor: "pointer",
+};
 
 export default function NewVisitPage() {
   const { id } = useParams();
@@ -41,27 +57,80 @@ export default function NewVisitPage() {
   const [attachments, setAttachments] = useState<AttachmentType[]>([]);
 
   const [visitDate, setVisitDate] = useState(
-    new Date().toISOString().split("T")[0],
+    new Date().toISOString().split("T")[0]
   );
   const [doctorName, setDoctorName] = useState("");
   const [presentingComplaint, setPresentingComplaint] = useState("");
   const [historyOfPresentingComplaint, setHistoryOfPresentingComplaint] =
     useState("");
-  const [observationAndExamination, setObservationAndExamination] =
-    useState("");
+  const [observationAndExamination, setObservationAndExamination] = useState("");
   const [impression, setImpression] = useState("");
   const [plan, setPlan] = useState("");
   const [notes, setNotes] = useState("");
 
-  const [medicalFocusQuestionnaire, setMedicalFocusQuestionnaire] = useState<
-    any | null
-  >(null);
-  const [radiationQuestionnaire, setRadiationQuestionnaire] = useState<
-    any | null
-  >(null);
-  const [sandstormQuestionnaire, setSandstormQuestionnaire] = useState<
-    any | null
-  >(null);
+  const [medicalFocusQuestionnaire, setMedicalFocusQuestionnaire] =
+    useState<any | null>(null);
+  const [radiationQuestionnaire, setRadiationQuestionnaire] =
+    useState<any | null>(null);
+  const [sandstormQuestionnaire, setSandstormQuestionnaire] =
+    useState<any | null>(null);
+
+  // Template management states
+  const defaultTemplates: Template[] = [
+    {
+      id: "1",
+      title: "Blood Sugar",
+      content: "Fasting: mg/dL\nRandom: mg/dL\nHbA1c: %\nNotes: ",
+    },
+    {
+      id: "2",
+      title: "Blood Pressure",
+      content: "BP: / mmHg\nHeart Rate: bpm\nPosition: Sitting / Standing\nNotes: ",
+    },
+    {
+      id: "3",
+      title: "Weight and Height",
+      content: "Weight: kg\nHeight: cm\nBMI:\nNotes: ",
+    },
+    {
+      id: "4",
+      title: "Vision Test",
+      content: "Right Eye:\nLeft Eye:\nWith Glasses: Yes / No\nNotes: ",
+    },
+    {
+      id: "5",
+      title: "Malaria Screen",
+      content:
+        "RDT Performed: Yes / No\nResult: Positive / Negative\nTemperature: °C\nNotes: ",
+    },
+    {
+      id: "6",
+      title: "Urine Dip",
+      content:
+        "Protein:\nGlucose:\nKetones:\nBlood:\nNitrites:\nLeukocytes:\nNotes: ",
+    },
+    {
+      id: "7",
+      title: "Peak Flow (Asthma)",
+      content: "Peak Flow: L/min\nPredicted: L/min\n% Predicted:\nNotes: ",
+    },
+  ];
+
+  const [templates, setTemplates] = useState<Template[]>(() => {
+    if (typeof window === "undefined") return defaultTemplates;
+    const saved = localStorage.getItem("visitTemplates");
+    return saved ? JSON.parse(saved) : defaultTemplates;
+  });
+
+  const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
+  const [addingTemplate, setAddingTemplate] = useState(false);
+  const [newTemplateTitle, setNewTemplateTitle] = useState("");
+  const [newTemplateContent, setNewTemplateContent] = useState("");
+
+  // Save templates to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("visitTemplates", JSON.stringify(templates));
+  }, [templates]);
 
   useEffect(() => {
     const fetchClient = async () => {
@@ -83,8 +152,33 @@ export default function NewVisitPage() {
     if (!dobString) return "N/A";
     const dob = new Date(dobString);
     return Math.abs(
-      new Date(Date.now() - dob.getTime()).getUTCFullYear() - 1970,
+      new Date(Date.now() - dob.getTime()).getUTCFullYear() - 1970
     );
+  };
+
+  const addTemplateToNotes = (template: Template) => {
+    const sep = notes ? "\n\n---\n\n" : "";
+    setNotes((currentNotes) => currentNotes + sep + `[${template.title}]\n${template.content}`);
+    setShowTemplateDropdown(false);
+  };
+
+  const saveNewTemplate = () => {
+    if (!newTemplateTitle || !newTemplateContent) return;
+    const newTemplate = {
+      id: Date.now().toString(),
+      title: newTemplateTitle,
+      content: newTemplateContent,
+    };
+    setTemplates((prev) => [...prev, newTemplate]);
+    setNewTemplateTitle("");
+    setNewTemplateContent("");
+    setAddingTemplate(false);
+    addTemplateToNotes(newTemplate);
+  };
+
+  const deleteTemplate = (templateId: string) => {
+    if (!confirm("Delete this template?")) return;
+    setTemplates((prev) => prev.filter((t) => t.id !== templateId));
   };
 
   const handleSave = async () => {
@@ -92,7 +186,6 @@ export default function NewVisitPage() {
       alert("Please enter the name of the clinician seen by the patient.");
       return;
     }
-
     setIsSaving(true);
     try {
       const res = await fetch("/api/visits", {
@@ -108,14 +201,11 @@ export default function NewVisitPage() {
           plan,
           notes,
           visitDate,
-
-          // JSON Blob data for questionnaires, again, last minute implementation
           medicalFocusQuestionnaire,
           radiationQuestionnaire,
           sandstormQuestionnaire,
         }),
       });
-
       if (!res.ok) throw new Error("Failed to save visit");
       const savedVisit = await res.json();
       setVisitId(savedVisit.id);
@@ -167,6 +257,7 @@ export default function NewVisitPage() {
         <Activity className="animate-spin text-brand-orange" size={48} />
       </div>
     );
+
   if (!client)
     return (
       <div className="p-10 text-center font-bold text-gray-500">
@@ -227,10 +318,7 @@ export default function NewVisitPage() {
                   Seen By (Doctor) *
                 </label>
                 <div className="relative">
-                  <Stethoscope
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    size={18}
-                  />
+                  <Stethoscope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                   <input
                     type="text"
                     placeholder="Enter doctor's name"
@@ -250,6 +338,94 @@ export default function NewVisitPage() {
               <ClipboardCheck className="text-brand-orange" />
               Clinical Documentation
             </h2>
+            
+            {/* Medical Registry Button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowTemplateDropdown(!showTemplateDropdown)}
+                className="flex items-center gap-2 bg-brand-orange hover:bg-brand-dark-orange text-white py-3 px-4 rounded-xl font-bold shadow-lg shadow-orange-500/20 transition-all active:scale-95"
+              >
+                <BookOpen size={18} />
+                Medical Registry
+              </button>
+
+              {showTemplateDropdown && (
+                <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 w-96 max-h-[400px] overflow-y-auto z-50">
+                  <div className="p-4">
+                    <h3 className="text-sm font-bold text-gray-700 mb-3">Templates</h3>
+                    {templates.map((template) => (
+                      <div
+                        key={template.id}
+                        className="flex items-start justify-between p-3 hover:bg-gray-50 rounded-lg border-b border-gray-100 last:border-b-0"
+                      >
+                        <button
+                          onClick={() => addTemplateToNotes(template)}
+                          className="text-left flex-1 cursor-pointer"
+                        >
+                          <div className="font-medium text-gray-800">{template.title}</div>
+                          <div className="text-xs text-gray-500 mt-1 line-clamp-2">
+                            {template.content.slice(0, 60)}
+                            {template.content.length > 60 ? "…" : ""}
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => deleteTemplate(template.id)}
+                          className="ml-2 text-gray-400 hover:text-red-500 transition-colors p-1"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {addingTemplate ? (
+                    <div className="p-4 border-t border-gray-200">
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          placeholder="Template Title"
+                          value={newTemplateTitle}
+                          onChange={(e) => setNewTemplateTitle(e.target.value)}
+                          className="w-full bg-gray-50 border border-gray-200 p-2 rounded-lg text-sm"
+                        />
+                        <textarea
+                          placeholder="Template Content"
+                          value={newTemplateContent}
+                          onChange={(e) => setNewTemplateContent(e.target.value)}
+                          rows={3}
+                          className="w-full bg-gray-50 border border-gray-200 p-2 rounded-lg text-sm"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={saveNewTemplate}
+                            className="flex-1 bg-brand-orange hover:bg-brand-dark-orange text-white py-2 rounded-lg text-sm font-medium"
+                          >
+                            Save Template
+                          </button>
+                          <button
+                            onClick={() => {
+                              setAddingTemplate(false);
+                              setNewTemplateTitle("");
+                              setNewTemplateContent("");
+                            }}
+                            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setAddingTemplate(true)}
+                      className="w-full text-center py-3 bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium border-t border-gray-200"
+                    >
+                      + Add New Template
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
 
             <div className="space-y-6">
               <DocField
@@ -267,7 +443,6 @@ export default function NewVisitPage() {
                 value={observationAndExamination}
                 setter={setObservationAndExamination}
               />
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <DocField
                   label="Clinical Impression"
@@ -282,7 +457,6 @@ export default function NewVisitPage() {
                   rows={4}
                 />
               </div>
-
               <DocField
                 label="Extra Notes"
                 value={notes}
@@ -292,9 +466,20 @@ export default function NewVisitPage() {
             </div>
           </div>
 
-          <MedicalQuestionnaire onUpdate={setMedicalFocusQuestionnaire} />
-          <RadiationQuestionnaire onUpdate={setRadiationQuestionnaire} />
-          <SandstormQuestionnaire onUpdate={setSandstormQuestionnaire} />
+          <div className="space-y-6">
+  <CollapsibleSection title="Medical Focus Questionnaire (Optional)">
+    <MedicalQuestionnaire onUpdate={setMedicalFocusQuestionnaire} />
+  </CollapsibleSection>
+
+  <CollapsibleSection title="Radiation Exposure Questionnaire (Optional)">
+    <RadiationQuestionnaire onUpdate={setRadiationQuestionnaire} />
+  </CollapsibleSection>
+
+  <CollapsibleSection title="Sandstorm Exposure Questionnaire (Optional)">
+    <SandstormQuestionnaire onUpdate={setSandstormQuestionnaire} />
+  </CollapsibleSection>
+</div>
+
         </div>
 
         {/* Files & Actions */}
@@ -302,14 +487,12 @@ export default function NewVisitPage() {
           {/* Save Action Card */}
           <div className="bg-white rounded-3xl shadow-clean border border-gray-100 p-8 space-y-6 sticky top-8">
             <h2 className="text-lg font-black text-gray-800">Finalize Visit</h2>
-
             {visitSavedMessage && (
               <div className="flex items-center gap-3 bg-emerald-50 text-emerald-700 p-4 rounded-2xl border border-emerald-100 text-sm font-bold animate-in zoom-in duration-300">
                 <CheckCircle2 size={20} />
                 Visit saved successfully!
               </div>
             )}
-
             {!visitId ? (
               <button
                 onClick={handleSave}
@@ -335,34 +518,27 @@ export default function NewVisitPage() {
 
             {/* Document Upload (Only active after visit is saved) */}
             <div
-              className={`space-y-4 pt-4 border-t border-gray-50 transition-opacity ${!visitId ? "opacity-40 pointer-events-none" : "opacity-100"}`}
+              className={`space-y-4 pt-4 border-t border-gray-50 transition-opacity ${
+                !visitId ? "opacity-40 pointer-events-none" : "opacity-100"
+              }`}
             >
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">
                   Supporting Files
                 </h3>
                 {isUploadingFile && (
-                  <Loader2
-                    className="animate-spin text-brand-orange"
-                    size={16}
-                  />
+                  <Loader2 className="animate-spin text-brand-orange" size={16} />
                 )}
               </div>
-
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50 hover:bg-orange-50 hover:border-brand-orange/30 transition-all cursor-pointer group">
-                <Upload
-                  className="text-gray-400 group-hover:text-brand-orange mb-2"
-                  size={24}
-                />
+                <Upload className="text-gray-400 group-hover:text-brand-orange mb-2" size={24} />
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-tighter">
                   Click to upload
                 </span>
                 <input
                   type="file"
                   className="hidden"
-                  onChange={(e) =>
-                    e.target.files?.[0] && handleFileUpload(e.target.files[0])
-                  }
+                  onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
                   disabled={isUploadingFile || !visitId}
                 />
               </label>
@@ -375,10 +551,7 @@ export default function NewVisitPage() {
                     className="flex items-center justify-between bg-gray-50 p-3 rounded-xl border border-gray-100 group"
                   >
                     <div className="flex items-center gap-2 overflow-hidden">
-                      <FileText
-                        size={16}
-                        className="text-brand-orange shrink-0"
-                      />
+                      <FileText size={16} className="text-brand-orange shrink-0" />
                       <span className="text-xs font-bold text-gray-700 truncate">
                         {att.fileName}
                       </span>

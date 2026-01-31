@@ -1,0 +1,187 @@
+/* src/styles/MedicalRegistryPopup.css - ORANGE THEME */
+.medical-registry-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #d97706; /* amber-600 */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.medical-registry-btn:hover {
+  background: #b45309; /* amber-700 */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.medical-registry-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  padding: 20px;
+}
+
+.medical-registry-popup {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1200px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.medical-registry-popup h2 {
+  background: #92400e; /* amber-800 */
+  color: white;
+  margin: 0;
+  padding: 20px;
+  font-size: 24px;
+}
+
+.medical-registry-popup > p {
+  background: #78350f; /* amber-900 */
+  color: white;
+  margin: 0;
+  padding: 15px 20px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.medical-registry-popup input {
+  margin: 20px;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
+  width: calc(100% - 40px);
+}
+
+.medical-registry-popup input:focus {
+  outline: none;
+  border-color: #f59e0b; /* amber-500 */
+}
+
+.search-results {
+  margin: 0 20px 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-results button {
+  width: 100%;
+  padding: 12px;
+  text-align: left;
+  border: none;
+  background: none;
+  border-bottom: 1px solid #f7fafc;
+  cursor: pointer;
+}
+
+.search-results button:hover {
+  background: #f7fafc;
+}
+
+.registry-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.registry-layout aside {
+  width: 250px;
+  background: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.registry-layout aside button {
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  text-align: left;
+  border: none;
+  background: #edf2f7;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.registry-layout aside button.active {
+  background: #f59e0b; /* amber-500 */
+  color: white;
+}
+
+.registry-layout main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.registry-layout main h3 {
+  margin-top: 0;
+  color: #2d3748;
+}
+
+.registry-layout main h4 {
+  color: #4a5568;
+  margin: 20px 0 10px;
+}
+
+/* Close button (if you added it) */
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Category badge */
+.content-category {
+  display: inline-block;
+  background: #fbbf24; /* amber-400 */
+  color: #92400e; /* amber-800 */
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 10px;
+}

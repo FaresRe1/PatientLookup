@@ -1,0 +1,30 @@
+{
+  "context": "This medical registry is designed for experienced UK-trained doctors operating in field medicine deployments in the Sahara Desert. It prioritises practical decision-making under resource limitations, environmental extremes, delayed evacuation, and frequent concurrent use of traditional herbal medicines. Content emphasises stabilisation, risk recognition, and safe adaptation of standard UK practice to austere desert settings.",
+  "cardiovascular_medicine": {
+    "acute_coronary_syndrome": "Acute coronary syndrome in the field often presents atypically, particularly in older patients and those with diabetes. Heat stress and dehydration frequently mask classical signs or worsen haemodynamic instability. In the absence of laboratory confirmation, diagnosis is clinical and ECG-based if available. Immediate priorities are symptom relief, prevention of further thrombosis, and early evacuation. Aspirin should be administered unless contraindicated. Oxygen is only indicated if oxygen saturation is below 94 percent, as hyperoxia may worsen outcomes. Nitrates should be used cautiously due to dehydration-related hypotension. Morphine is reserved for severe, refractory pain. Definitive reperfusion is not achievable in field settings, making early evacuation essential. Herbal medicines such as garlic or hawthorn may potentiate hypotension or bleeding and should be actively queried.",
+    "hypertension": "Hypertension management in desert environments differs significantly from temperate, resource-rich settings. Dehydration, heat exposure, and diarrhoeal illness commonly cause transient hypotension, even in chronically hypertensive patients. Aggressive blood pressure reduction should be avoided. ACE inhibitors and angiotensin receptor blockers carry a heightened risk of acute kidney injury during volume depletion and should be withheld during acute illness or heat exhaustion. Herbal preparations containing licorice can worsen hypertension and cause hypokalaemia, while aloe vera may exacerbate potassium loss when combined with diuretics."
+  },
+  "heat_related_illness": {
+    "overview": "Heat-related illness is a central pathology in Saharan field medicine and frequently coexists with other conditions. Heat exhaustion presents with fatigue, dizziness, tachycardia, and preserved mental status, and responds to cooling, rest, and oral rehydration. Heat stroke is defined by altered mental status and represents a medical emergency with high mortality. Core temperature measurement may be unavailable, and diagnosis should be clinical. Immediate active cooling and intravenous fluids are priorities, followed by urgent evacuation. Herbal stimulants or diuretics may exacerbate dehydration and heat injury."
+  },
+  "infectious_diseases": {
+    "gastrointestinal_infection": "Gastrointestinal infections are common due to water contamination and food insecurity. Diarrhoeal illness rapidly leads to dehydration and electrolyte imbalance in desert conditions. Oral rehydration is the cornerstone of management. Antibiotics are reserved for dysentery, high fever with systemic toxicity, or suspected cholera. Antimotility agents should be avoided in invasive disease. Herbal purgatives frequently worsen fluid loss and should be discontinued.",
+    "skin_and_soft_tissue": "Minor wounds frequently progress to serious infection due to delayed presentation, contamination, and use of occlusive traditional remedies. Early irrigation, debridement, and appropriate antibiotics are critical. Tetanus immunisation status is often unknown and should be assumed incomplete. Herbal pastes applied to wounds commonly increase infection risk."
+  },
+  "respiratory_medicine": {
+    "asthma_and_copd": "Dust exposure, heat, and respiratory infections commonly exacerbate asthma and COPD in the desert. Inhaled bronchodilators remain first-line therapy, with systemic corticosteroids for moderate to severe exacerbations. Dehydration thickens secretions and worsens airflow limitation. Beta-blockers should be avoided where possible. Herbal stimulants resembling ephedra may provoke tachyarrhythmias and worsen respiratory distress."
+  },
+  "neurology_and_emergencies": {
+    "stroke": "Stroke care in the field is limited to supportive management. In the absence of imaging, haemorrhage cannot be excluded and thrombolysis is contraindicated. Management focuses on airway protection, hydration, blood pressure moderation, and early evacuation.",
+    "seizures": "Seizures are commonly precipitated by dehydration, infection, hypoglycaemia, or interruption of antiepileptic medication. Prolonged seizures should be treated with benzodiazepines if available. Correction of reversible metabolic causes is essential. Traditional remedies may lower seizure threshold or interact with antiepileptics."
+  },
+  "trauma": {
+    "overview": "Trauma in desert environments carries a high risk of infection and delayed complications. Initial management prioritises haemorrhage control, wound cleaning, immobilisation of fractures, and early antibiotic use for open injuries. Evacuation decisions should account for distance, patient stability, and infection risk."
+  },
+  "herbal_medicine_considerations": {
+    "overview": "Traditional herbal medicine use is widespread and often undisclosed unless specifically asked about. Many preparations have anticoagulant, hepatotoxic, nephrotoxic, or hypotensive effects. Clinicians should actively enquire about recent herbal use in all patients. Development of jaundice, bleeding, acute kidney injury, or altered mental status should prompt immediate cessation of all non-essential remedies."
+  },
+  "palliative_and_ethics": {
+    "overview": "Field medicine often involves limited escalation options. In patients with advanced illness or non-survivable conditions, care should focus on symptom relief, hydration, pain control, and dignity. Clear communication with patients and families is essential, recognising cultural expectations and resource constraints."
+  }
+}

@@ -49,7 +49,7 @@ export default function Home() {
           <thead className="bg-orange-50/50 border-b border-orange-100">
             <tr>
               <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest">Patient Name</th>
-              <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest">Contact Info</th>
+              <th className="hidden sm:table-cell px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest">Contact Info</th>
               <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Actions</th>
             </tr>
           </thead>
@@ -60,7 +60,7 @@ export default function Home() {
                   <td className="px-8 py-6">
                     <span className="text-gray-900 font-bold text-lg">{client.fullName}</span>
                   </td>
-                  <td className="px-8 py-6">
+                  <td className="hidden sm:table-cell px-8 py-6">
                     <span className="text-gray-500 font-medium">{client.email || "No email provided"}</span>
                   </td>
                   <td className="px-8 py-6">
