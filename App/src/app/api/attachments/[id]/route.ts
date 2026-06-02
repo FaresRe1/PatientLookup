@@ -1,63 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "~/server/db";
-import { authWrapper } from "~/utils/authWrapper";
+import { errorResponse } from "~/lib/api";
 
-// GET: Download a specific attachment
-export const GET = authWrapper(async (req: NextRequest, { params }: { params: { id: string } }) => {
-    try {
-        const { id } = params;
+type RouteContext = { params: Promise<{ id: string }> };
 
-        const attachment = await db.visitAttachment.findUnique({
-            where: { id }
-        });
+export async function GET(_req: NextRequest, context: RouteContext) {
+  try {
+    const { id } = await context.params;
 
-        if (!attachment) {
-            return NextResponse.json({ msg: "Attachment not found" }, { status: 404 });
-        }
+    const attachment = await db.visitAttachment.findUnique({
+      where: { id },
+    });
 
-        return new NextResponse(attachment.fileData, {
-            status: 200,
-            headers: {
-                "Content-Type": attachment.fileType,
-                "Content-Disposition": `attachment; filename="${attachment.fileName}"`,
-                "Content-Length": attachment.fileSize.toString()
-            }
-        });
+    if (!attachment) return errorResponse("Attachment not found", 404);
 
-    } catch (error: any) {
-        console.error("Download attachment error:", error);
-        return NextResponse.json(
-            { msg: "Failed to download attachment", error: error.message },
-            { status: 500 }
-        );
-    }
-});
+    return new NextResponse(attachment.fileData, {
+      status: 200,
+      headers: {
+        "Content-Type": attachment.fileType,
+        "Content-Disposition": `attachment; filename="${attachment.fileName}"`,
+        "Content-Length": attachment.fileSize.toString(),
+      },
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return errorResponse("Failed to download attachment", 500, msg);
+  }
+}
 
-// DELETE: Remove an attachment
-export const DELETE = authWrapper(async (req: NextRequest, { params }: { params: { id: string } }) => {
-    try {
-        const { id } = params;
+export async function DELETE(_req: NextRequest, context: RouteContext) {
+  try {
+    const { id } = await context.params;
 
-        const attachment = await db.visitAttachment.findUnique({
-            where: { id }
-        });
+    const attachment = await db.visitAttachment.findUnique({
+      where: { id },
+    });
 
-        if (!attachment) {
-            return NextResponse.json({ msg: "Attachment not found" }, { status: 404 });
-        }
+    if (!attachment) return errorResponse("Attachment not found", 404);
 
-        // Delete the attachment
-        await db.visitAttachment.delete({
-            where: { id }
-        });
+    await db.visitAttachment.delete({ where: { id } });
 
-        return NextResponse.json({ msg: "Attachment deleted successfully" });
-
-    } catch (error: any) {
-        console.error("Delete attachment error:", error);
-        return NextResponse.json(
-            { msg: "Failed to delete attachment", error: error.message },
-            { status: 500 }
-        );
-    }
-});
+    return NextResponse.json({ msg: "Attachment deleted successfully" });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return errorResponse("Failed to delete attachment", 500, msg);
+  }
+}

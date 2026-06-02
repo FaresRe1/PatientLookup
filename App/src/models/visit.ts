@@ -1,7 +1,16 @@
 import { z } from "zod";
 
-export const VisitBase = z.object({
-  clientId: z.string().min(1, "Client ID is required"),
+const datePreprocess = (v: unknown) => {
+  if (typeof v === "string" && v) return new Date(v);
+  if (v instanceof Date) return v;
+  return v;
+};
+
+const isoPreprocess = (v: unknown) =>
+  v instanceof Date ? v.toISOString() : v;
+
+export const VisitCreate = z.object({
+  clientId: z.string().min(1, "Patient ID is required"),
   doctorName: z.string().min(1, "Doctor name is required"),
   presentingComplaint: z.string().optional().nullable(),
   historyOfPresentingComplaint: z.string().optional().nullable(),
@@ -9,28 +18,13 @@ export const VisitBase = z.object({
   impression: z.string().optional().nullable(),
   plan: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
-  visitDate: z.preprocess((v) => {
-    if (typeof v === "string" && v) return new Date(v as string);
-    if (v instanceof Date) return v;
-    return v;
-  }, z.date()),
-  forms: z
-    .array(
-      z.object({
-        templateId: z.string(),
-        templateName: z.string(),
-        answers: z.record(z.any()),
-      })
-    )
-    .optional(),
+  visitDate: z.preprocess(datePreprocess, z.date()),
 });
-
-export const VisitCreate = VisitBase;
 
 export const VisitResponse = z.object({
   id: z.string(),
-  createdAt: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.string()),
-  visitDate: z.preprocess((v) => (v instanceof Date ? v.toISOString() : v), z.string()),
+  createdAt: z.preprocess(isoPreprocess, z.string()),
+  visitDate: z.preprocess(isoPreprocess, z.string()),
   doctorName: z.string(),
   presentingComplaint: z.string().nullable().optional(),
   historyOfPresentingComplaint: z.string().nullable().optional(),
@@ -39,15 +33,6 @@ export const VisitResponse = z.object({
   plan: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
   clientId: z.string(),
-  forms: z
-    .array(
-      z.object({
-        templateId: z.string(),
-        templateName: z.string(),
-        answers: z.record(z.any()),
-      })
-    )
-    .optional(),
 });
 
 export type VisitCreateType = z.infer<typeof VisitCreate>;

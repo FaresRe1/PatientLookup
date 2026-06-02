@@ -4,7 +4,17 @@
   --color-brand-orange: #F97316;
   --color-brand-dark-orange: #EA580C;
   --color-brand-cream: #FFFBF4;
-  
+
+  /* ── Semantic hub / card tokens (override in html.dark below) ─── */
+  --color-clinic-icon-bg:  #FEF3E2;   /* clinical station icon bg   */
+  --color-util-icon-bg:    #F1EFE8;   /* utility page icon bg        */
+  --color-util-icon:       #888780;   /* utility icon / text colour  */
+  --color-card-rim:        #F3E8D8;   /* card border                 */
+  --color-session-strip:   #FEF3E2;   /* session strip bg            */
+  --color-session-rim:     #FDDCB0;   /* session strip border        */
+  --color-session-live:    #92400E;   /* "Session Live" label        */
+  --color-progress-rail:   #F3E8D8;   /* progress track bg           */
+
   --shadow-clean: 0 20px 25px -5px rgba(249, 115, 22, 0.05), 0 8px 10px -6px rgba(249, 115, 22, 0.05);
 }
 
@@ -15,7 +25,150 @@
 }
 
 @layer components {
-.form-input-styled {
-@apply w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-4 focus:ring-orange-100 focus:bg-white outline-none transition-all placeholder:text-gray-300 text-gray-900 font-medium;
+  .form-input-styled {
+    @apply w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-4 focus:ring-orange-100 focus:bg-white outline-none transition-all placeholder:text-gray-300 text-gray-900 font-medium;
+  }
 }
+
+/* ─── Light mode card border refinement ─────────────────────────── */
+/* Override Tailwind's cool gray-100 with the warm cream border spec */
+.border-gray-100 { border-color: #F3E8D8; }
+
+/* ─── Dark Mode ──────────────────────────────────────────────────── */
+
+html.dark {
+  color-scheme: dark;
+
+  /* Override semantic tokens for dark graphite theme */
+  --color-clinic-icon-bg:  #2C1E0E;
+  --color-util-icon-bg:    #242424;
+  --color-util-icon:       #666666;
+  --color-card-rim:        #2C2C2E;
+  --color-session-strip:   #1C1C1E;
+  --color-session-rim:     #2C2C2E;
+  --color-session-live:    #F97316;
+  --color-progress-rail:   #2C2C2E;
+
+  --shadow-clean: 0 4px 6px -1px rgba(0,0,0,0.5), 0 2px 4px -2px rgba(0,0,0,0.4);
 }
+
+html.dark body {
+  background-color: #111111;
+  color: #F5F5F5;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+html.dark header {
+  background-image: none;
+  background-color: #1C1C1E;
+  box-shadow: 0 1px 0 0 #2C2C2E;
+}
+/* Keep the logo icon orange; soften the title text */
+html.dark .header-logo-icon { color: #F97316; }
+html.dark header h1          { color: #F5F5F5; }
+
+/* ── Neutral surfaces ────────────────────────────────────────────── */
+html.dark .bg-white       { background-color: #1C1C1E; }
+html.dark .bg-gray-50     { background-color: #111111; }
+html.dark .bg-brand-cream { background-color: #111111; }
+html.dark .bg-white\/95   { background-color: rgba(28, 28, 30, 0.95); }
+html.dark .bg-white\/80   { background-color: rgba(28, 28, 30, 0.80); }
+
+/* ── Neutral text ────────────────────────────────────────────────── */
+html.dark .text-gray-900  { color: #F5F5F5; }
+html.dark .text-gray-800  { color: #E5E5E5; }
+html.dark .text-gray-700  { color: #C0C0C0; }
+html.dark .text-gray-600  { color: #888888; }
+html.dark .text-gray-500  { color: #666666; }
+html.dark .text-gray-400  { color: #666666; }
+html.dark .text-gray-300  { color: #4C4C4E; }
+
+/* ── Neutral borders ─────────────────────────────────────────────── */
+html.dark .border-gray-100 { border-color: #2C2C2E; }
+html.dark .border-gray-50  { border-color: #1C1C1E; }
+html.dark .border-gray-200 { border-color: #3C3C3E; }
+html.dark .border-gray-300 { border-color: #3C3C3E; }
+
+/* ── Dividers ────────────────────────────────────────────────────── */
+html.dark .divide-gray-50 > * + * { border-color: #1C1C1E; }
+
+/* ── Icon container backgrounds ─────────────────────────────────── */
+html.dark .bg-gray-100 { background-color: #2C2C2E; }
+
+/* ── Form inputs ─────────────────────────────────────────────────── */
+html.dark .form-input-styled {
+  background-color: #111111;
+  border-color: #2C2C2E;
+  color: #F5F5F5;
+}
+html.dark .form-input-styled:focus       { background-color: #1C1C1E; }
+html.dark .form-input-styled::placeholder { color: #3C3C3E; }
+
+/* ── Upload / file button ────────────────────────────────────────── */
+html.dark .bg-gray-200 { background-color: #2C2C2E; }
+
+/* ── Stage/status -50 tinted backgrounds ────────────────────────── */
+html.dark .bg-sky-50      { background-color: rgba(14, 165, 233, 0.08); }
+html.dark .bg-amber-50    { background-color: rgba(245, 158, 11, 0.08); }
+html.dark .bg-violet-50   { background-color: rgba(139, 92, 246, 0.08); }
+html.dark .bg-indigo-50   { background-color: rgba(99, 102, 241, 0.08); }
+html.dark .bg-pink-50     { background-color: rgba(236, 72, 153, 0.08); }
+html.dark .bg-rose-50     { background-color: rgba(244, 63, 94, 0.08); }
+html.dark .bg-orange-50   { background-color: rgba(249, 115, 22, 0.08); }
+html.dark .bg-emerald-50  { background-color: rgba(52, 211, 153, 0.08); }
+html.dark .bg-purple-50   { background-color: rgba(168, 85, 247, 0.08); }
+html.dark .bg-red-50      { background-color: rgba(239, 68, 68, 0.08); }
+html.dark .bg-green-50    { background-color: rgba(34, 197, 94, 0.08); }
+html.dark .bg-teal-50     { background-color: rgba(20, 184, 166, 0.08); }
+
+/* Opacity variants used in queue cards */
+html.dark .bg-amber-50\/30  { background-color: rgba(245, 158, 11, 0.06); }
+html.dark .bg-orange-50\/30 { background-color: rgba(249, 115, 22, 0.06); }
+html.dark .bg-orange-50\/50 { background-color: rgba(249, 115, 22, 0.06); }
+
+/* ── Badge / icon -100 backgrounds ──────────────────────────────── */
+html.dark .bg-orange-100  { background-color: rgba(249, 115, 22, 0.15); }
+html.dark .bg-sky-100     { background-color: rgba(14, 165, 233, 0.15); }
+html.dark .bg-amber-100   { background-color: rgba(245, 158, 11, 0.15); }
+html.dark .bg-emerald-100 { background-color: rgba(52, 211, 153, 0.15); }
+html.dark .bg-purple-100  { background-color: rgba(168, 85, 247, 0.15); }
+html.dark .bg-red-100     { background-color: rgba(239, 68, 68, 0.15); }
+html.dark .bg-violet-100  { background-color: rgba(139, 92, 246, 0.15); }
+html.dark .bg-indigo-100  { background-color: rgba(99, 102, 241, 0.15); }
+html.dark .bg-pink-100    { background-color: rgba(236, 72, 153, 0.15); }
+html.dark .bg-rose-100    { background-color: rgba(244, 63, 94, 0.15); }
+
+/* ── Colored borders ─────────────────────────────────────────────── */
+html.dark .border-sky-200     { border-color: rgba(14, 165, 233, 0.3); }
+html.dark .border-amber-200   { border-color: rgba(245, 158, 11, 0.3); }
+html.dark .border-amber-100   { border-color: rgba(245, 158, 11, 0.2); }
+html.dark .border-violet-200  { border-color: rgba(139, 92, 246, 0.3); }
+html.dark .border-indigo-200  { border-color: rgba(99, 102, 241, 0.3); }
+html.dark .border-pink-200    { border-color: rgba(236, 72, 153, 0.3); }
+html.dark .border-rose-200    { border-color: rgba(244, 63, 94, 0.3); }
+html.dark .border-orange-200  { border-color: rgba(249, 115, 22, 0.3); }
+html.dark .border-orange-100  { border-color: rgba(249, 115, 22, 0.2); }
+html.dark .border-emerald-200 { border-color: rgba(52, 211, 153, 0.3); }
+html.dark .border-emerald-100 { border-color: rgba(52, 211, 153, 0.2); }
+html.dark .border-purple-200  { border-color: rgba(168, 85, 247, 0.3); }
+html.dark .border-red-100     { border-color: rgba(239, 68, 68, 0.2); }
+html.dark .border-red-200     { border-color: rgba(239, 68, 68, 0.3); }
+html.dark .border-white\/60   { border-color: rgba(255, 255, 255, 0.1); }
+
+/* ── Colored text in badges and UI elements ──────────────────────── */
+html.dark .text-sky-700      { color: #7dd3fc; }
+html.dark .text-amber-700    { color: #fcd34d; }
+html.dark .text-amber-800    { color: #fcd34d; }
+html.dark .text-amber-900    { color: #fde68a; }
+html.dark .text-amber-600    { color: #fbbf24; }
+html.dark .text-violet-700   { color: #c4b5fd; }
+html.dark .text-indigo-700   { color: #a5b4fc; }
+html.dark .text-pink-700     { color: #f9a8d4; }
+html.dark .text-rose-700     { color: #fca5a5; }
+html.dark .text-emerald-700  { color: #6ee7b7; }
+html.dark .text-emerald-800  { color: #6ee7b7; }
+html.dark .text-emerald-600  { color: #34d399; }
+html.dark .text-purple-700   { color: #d8b4fe; }
+html.dark .text-orange-700   { color: #fdba74; }
+html.dark .text-red-700      { color: #fca5a5; }
+html.dark .text-red-600      { color: #f87171; }

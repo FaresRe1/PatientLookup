@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ClientCreate } from "~/models/client";
+import { PatientCreate } from "~/models/patient";
 
 const prisma = new PrismaClient();
 
@@ -33,24 +33,21 @@ async function main() {
       fullName: "User Fourth",
       gender: "Male",
       dob: "1980-01-01",
-      email: "user4@email.com",
       phoneNumber: "12345678910",
-      address: "13 bold way",
+      village: "Test Village",
     },
     {
       fullName: "User Fifth",
       gender: "Female",
       dob: "1992-05-12",
-      email: "user5@email.com",
       phoneNumber: "10987654321",
-      address: "15 bold way",
+      village: "Test Village",
     },
   ];
 
   for (const u of clientData) {
-    // validate shape with central schema before writing to DB
-    const parsed = ClientCreate.parse(u);
-    const dobVal = parsed.dob instanceof Date ? parsed.dob : new Date(parsed.dob as any);
+    const parsed = PatientCreate.parse(u);
+    const dobVal = parsed.dob instanceof Date ? parsed.dob : new Date(parsed.dob as unknown as string);
     await prisma.client.create({ data: { ...parsed, dob: dobVal } });
   }
 

@@ -9,9 +9,11 @@
 /coverage
 
 # database
-/prisma/db.sqlite
-/prisma/db.sqlite-journal
-db.sqlite
+/prisma/app.db
+/prisma/app.db-journal
+
+# electron build output
+/main/index.js
 
 # next.js
 /.next/

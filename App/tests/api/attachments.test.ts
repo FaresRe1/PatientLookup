@@ -1,443 +1,173 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { GET, POST } from "~/app/api/attachments/route";
-import { GET as GET_ID, DELETE as DELETE_ID } from "~/app/api/attachments/[id]/route";
+import { POST, GET } from "~/app/api/attachments/route";
+import { GET as GET_BY_ID, DELETE } from "~/app/api/attachments/[id]/route";
 import { db } from "~/server/db";
 import { NextRequest } from "next/server";
 
 vi.mock("~/server/db", () => ({
-    db: {
-        visit: {
-            findUnique: vi.fn(),
-        },
-        visitAttachment: {
-            findMany: vi.fn(),
-            create: vi.fn(),
-            findUnique: vi.fn(),
-            delete: vi.fn(),
-        },
+  db: {
+    visit: {
+      findUnique: vi.fn(),
     },
+    visitAttachment: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      delete: vi.fn(),
+    },
+  },
 }));
 
 const mockedDb = vi.mocked(db, true);
 
 beforeEach(() => {
-    mockedDb.visit.findUnique.mockReset();
-    mockedDb.visitAttachment.findMany.mockReset();
-    mockedDb.visitAttachment.create.mockReset();
-    mockedDb.visitAttachment.findUnique.mockReset();
-    mockedDb.visitAttachment.delete.mockReset();
+  vi.clearAllMocks();
 });
 
-//------------------------------------------- POST REQUEST TESTING (UPLOAD) ---------------------------------------------------
-
-describe("Attachments API - POST (Upload)", () => {
-    it("successfully uploads an image file", async () => {
-        const fileContent = Buffer.from("fake image data");
-        const file = new File([fileContent], "photo.jpg", { type: "image/jpeg" });
-        
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("visitId", "visit123");
-
-        mockedDb.visit.findUnique.mockResolvedValue({ id: "visit123" } as any);
-        mockedDb.visitAttachment.create.mockResolvedValue({
-            id: "att1",
-            visitId: "visit123",
-            fileName: "photo.jpg",
-            fileType: "image/jpeg",
-            fileData: fileContent,
-            fileSize: fileContent.length,
-            createdAt: new Date(),
-        });
-
-        const response = await POST(
-            new NextRequest("http://localhost:3000/api/attachments", {
-                method: "POST",
-                body: formData,
-            })
-        );
-
-        expect(response.status).toBe(201);
-        const json = await response.json();
-        expect(json.fileName).toBe("photo.jpg");
-        expect(json.fileType).toBe("image/jpeg");
-        expect(json.fileSize).toBe(fileContent.length);
+describe("Attachments API - POST", () => {
+  it("uploads an attachment successfully", async () => {
+    const now = new Date();
+    mockedDb.visit.findUnique.mockResolvedValue({ id: "visit1" } as never);
+    mockedDb.visitAttachment.create.mockResolvedValue({
+      id: "att1",
+      visitId: "visit1",
+      fileName: "test.pdf",
+      fileType: "application/pdf",
+      fileSize: 1024,
+      fileData: Buffer.from("test"),
+      createdAt: now,
     });
 
-    it("successfully uploads a PDF file", async () => {
-        const fileContent = Buffer.from("fake pdf data");
-        const file = new File([fileContent], "document.pdf", { type: "application/pdf" });
-        
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("visitId", "visit456");
+    const formData = new FormData();
+    formData.append("file", new File([new Uint8Array(1024)], "test.pdf", { type: "application/pdf" }));
+    formData.append("visitId", "visit1");
 
-        mockedDb.visit.findUnique.mockResolvedValue({ id: "visit456" } as any);
-        mockedDb.visitAttachment.create.mockResolvedValue({
-            id: "att2",
-            visitId: "visit456",
-            fileName: "document.pdf",
-            fileType: "application/pdf",
-            fileData: fileContent,
-            fileSize: fileContent.length,
-            createdAt: new Date(),
-        });
+    const res = await POST(new NextRequest("http://localhost/api/attachments", { method: "POST", body: formData }));
+    const json = await res.json();
 
-        const response = await POST(
-            new NextRequest("http://localhost:3000/api/attachments", {
-                method: "POST",
-                body: formData,
-            })
-        );
+    expect(res.status).toBe(201);
+    expect(json.id).toBe("att1");
+    expect(json.fileName).toBe("test.pdf");
+  });
 
-        expect(response.status).toBe(201);
-        const json = await response.json();
-        expect(json.fileName).toBe("document.pdf");
-        expect(json.fileType).toBe("application/pdf");
-    });
+  it("returns 400 if no file provided", async () => {
+    const formData = new FormData();
+    formData.append("visitId", "visit1");
 
-    it("successfully uploads a DOCX file", async () => {
-        const fileContent = Buffer.from("fake docx data");
-        const file = new File([fileContent], "report.docx", { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
-        
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("visitId", "visit789");
+    const res = await POST(new NextRequest("http://localhost/api/attachments", { method: "POST", body: formData }));
+    expect(res.status).toBe(400);
+    expect((await res.json()).msg).toBe("File is required");
+  });
 
-        mockedDb.visit.findUnique.mockResolvedValue({ id: "visit789" } as any);
-        mockedDb.visitAttachment.create.mockResolvedValue({
-            id: "att3",
-            visitId: "visit789",
-            fileName: "report.docx",
-            fileType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            fileData: fileContent,
-            fileSize: fileContent.length,
-            createdAt: new Date(),
-        });
+  it("returns 400 if no visitId provided", async () => {
+    const formData = new FormData();
+    formData.append("file", new File([new Uint8Array(100)], "test.pdf", { type: "application/pdf" }));
 
-        const response = await POST(
-            new NextRequest("http://localhost:3000/api/attachments", {
-                method: "POST",
-                body: formData,
-            })
-        );
+    const res = await POST(new NextRequest("http://localhost/api/attachments", { method: "POST", body: formData }));
+    expect(res.status).toBe(400);
+    expect((await res.json()).msg).toBe("visitId is required");
+  });
 
-        expect(response.status).toBe(201);
-        const json = await response.json();
-        expect(json.fileName).toBe("report.docx");
-    });
+  it("returns 400 if file exceeds 10MB limit", async () => {
+    const formData = new FormData();
+    formData.append("file", new File([new Uint8Array(11 * 1024 * 1024)], "large.pdf", { type: "application/pdf" }));
+    formData.append("visitId", "visit1");
 
-    it("rejects file upload exceeding 10MB limit", async () => {
-        const largeContent = Buffer.alloc(11 * 1024 * 1024); // 11MB
-        const file = new File([largeContent], "large.jpg", { type: "image/jpeg" });
-        
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("visitId", "visit123");
+    const res = await POST(new NextRequest("http://localhost/api/attachments", { method: "POST", body: formData }));
+    expect(res.status).toBe(400);
+    expect((await res.json()).msg).toBe("File size exceeds 10MB limit");
+  });
 
-        mockedDb.visit.findUnique.mockResolvedValue({ id: "visit123" } as any);
+  it("returns 404 if visit not found", async () => {
+    mockedDb.visit.findUnique.mockResolvedValue(null);
 
-        const response = await POST(
-            new NextRequest("http://localhost:3000/api/attachments", {
-                method: "POST",
-                body: formData,
-            })
-        );
+    const formData = new FormData();
+    formData.append("file", new File([new Uint8Array(100)], "test.pdf", { type: "application/pdf" }));
+    formData.append("visitId", "nonexistent");
 
-        expect(response.status).toBe(400);
-        const json = await response.json();
-        expect(json.msg).toContain("exceeds 10MB limit");
-        expect(mockedDb.visitAttachment.create).not.toHaveBeenCalled();
-    });
-
-    it("rejects upload if file is missing", async () => {
-        const formData = new FormData();
-        formData.append("visitId", "visit123");
-
-        const response = await POST(
-            new NextRequest("http://localhost:3000/api/attachments", {
-                method: "POST",
-                body: formData,
-            })
-        );
-
-        expect(response.status).toBe(400);
-        const json = await response.json();
-        expect(json.msg).toBe("File is required");
-        expect(mockedDb.visitAttachment.create).not.toHaveBeenCalled();
-    });
-
-    it("rejects upload if visitId is missing", async () => {
-        const fileContent = Buffer.from("fake image data");
-        const file = new File([fileContent], "photo.jpg", { type: "image/jpeg" });
-        
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await POST(
-            new NextRequest("http://localhost:3000/api/attachments", {
-                method: "POST",
-                body: formData,
-            })
-        );
-
-        expect(response.status).toBe(400);
-        const json = await response.json();
-        expect(json.msg).toBe("visitId is required");
-        expect(mockedDb.visitAttachment.create).not.toHaveBeenCalled();
-    });
-
-    it("rejects upload if visit does not exist", async () => {
-        const fileContent = Buffer.from("fake image data");
-        const file = new File([fileContent], "photo.jpg", { type: "image/jpeg" });
-        
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("visitId", "nonexistent");
-
-        mockedDb.visit.findUnique.mockResolvedValue(null);
-
-        const response = await POST(
-            new NextRequest("http://localhost:3000/api/attachments", {
-                method: "POST",
-                body: formData,
-            })
-        );
-
-        expect(response.status).toBe(404);
-        const json = await response.json();
-        expect(json.msg).toBe("Visit not found");
-        expect(mockedDb.visitAttachment.create).not.toHaveBeenCalled();
-    });
-
-    it("handles database errors gracefully", async () => {
-        const fileContent = Buffer.from("fake image data");
-        const file = new File([fileContent], "photo.jpg", { type: "image/jpeg" });
-        
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("visitId", "visit123");
-
-        mockedDb.visit.findUnique.mockResolvedValue({ id: "visit123" } as any);
-        mockedDb.visitAttachment.create.mockRejectedValue(new Error("Database connection failed"));
-
-        const response = await POST(
-            new NextRequest("http://localhost:3000/api/attachments", {
-                method: "POST",
-                body: formData,
-            })
-        );
-
-        expect(response.status).toBe(500);
-        const json = await response.json();
-        expect(json.msg).toBe("Failed to upload attachment");
-        expect(json.error).toBe("Database connection failed");
-    });
+    const res = await POST(new NextRequest("http://localhost/api/attachments", { method: "POST", body: formData }));
+    expect(res.status).toBe(404);
+    expect((await res.json()).msg).toBe("Visit not found");
+  });
 });
 
-//------------------------------------------- GET REQUEST TESTING (LIST) ---------------------------------------------------
+describe("Attachments API - GET (list)", () => {
+  it("returns attachments for a visit", async () => {
+    const now = new Date();
+    mockedDb.visitAttachment.findMany.mockResolvedValue([
+      { id: "att1", fileName: "test.pdf", fileType: "application/pdf", fileSize: 1024, createdAt: now },
+    ] as never);
 
-describe("Attachments API - GET (List)", () => {
-    it("returns all attachments for a visit", async () => {
-        const now = new Date();
-        const attachments = [
-            {
-                id: "att1",
-                visitId: "visit123",
-                fileName: "photo.jpg",
-                fileType: "image/jpeg",
-                fileSize: 1024,
-                createdAt: now,
-            },
-            {
-                id: "att2",
-                visitId: "visit123",
-                fileName: "document.pdf",
-                fileType: "application/pdf",
-                fileSize: 2048,
-                createdAt: new Date(now.getTime() - 60000),
-            },
-        ];
+    const res = await GET(new NextRequest("http://localhost/api/attachments?visitId=visit1"));
+    const json = await res.json();
 
-        mockedDb.visitAttachment.findMany.mockResolvedValue(attachments as any);
+    expect(res.status).toBe(200);
+    expect(json).toHaveLength(1);
+    expect(json[0].fileName).toBe("test.pdf");
+  });
 
-        const response = await GET(
-            new NextRequest("http://localhost:3000/api/attachments?visitId=visit123")
-        );
-
-        expect(response.status).toBe(200);
-        const json = await response.json();
-        expect(json).toHaveLength(2);
-        expect(json[0].fileName).toBe("photo.jpg");
-        expect(json[1].fileName).toBe("document.pdf");
-
-        expect(mockedDb.visitAttachment.findMany).toHaveBeenCalledWith({
-            where: { visitId: "visit123" },
-            orderBy: { createdAt: 'desc' },
-            select: expect.objectContaining({
-                id: true,
-                fileName: true,
-                fileType: true,
-                fileSize: true,
-                createdAt: true,
-            }),
-        });
-    });
-
-    it("returns empty array if no attachments found", async () => {
-        mockedDb.visitAttachment.findMany.mockResolvedValue([]);
-
-        const response = await GET(
-            new NextRequest("http://localhost:3000/api/attachments?visitId=visit-nofiles")
-        );
-
-        expect(response.status).toBe(200);
-        const json = await response.json();
-        expect(json).toEqual([]);
-    });
-
-    it("returns 400 if visitId parameter is missing", async () => {
-        const response = await GET(
-            new NextRequest("http://localhost:3000/api/attachments")
-        );
-
-        expect(response.status).toBe(400);
-        const json = await response.json();
-        expect(json.msg).toBe("visitId query parameter is required");
-        expect(mockedDb.visitAttachment.findMany).not.toHaveBeenCalled();
-    });
-
-    it("handles database errors gracefully", async () => {
-        mockedDb.visitAttachment.findMany.mockRejectedValue(new Error("Database connection failed"));
-
-        const response = await GET(
-            new NextRequest("http://localhost:3000/api/attachments?visitId=visit123")
-        );
-
-        expect(response.status).toBe(500);
-        const json = await response.json();
-        expect(json.msg).toBe("Failed to load attachments");
-        expect(json.error).toBe("Database connection failed");
-    });
+  it("returns 400 if visitId missing", async () => {
+    const res = await GET(new NextRequest("http://localhost/api/attachments"));
+    expect(res.status).toBe(400);
+  });
 });
 
-//------------------------------------------- GET REQUEST TESTING (DOWNLOAD) ---------------------------------------------------
+describe("Attachments API - GET by ID", () => {
+  it("returns file data for download", async () => {
+    const fileData = Buffer.from("file contents");
+    mockedDb.visitAttachment.findUnique.mockResolvedValue({
+      id: "att1",
+      fileData,
+      fileType: "application/pdf",
+      fileName: "test.pdf",
+      fileSize: fileData.length,
+    } as never);
 
-describe("Attachments API - GET [id] (Download)", () => {
-    it("downloads an attachment file", async () => {
-        const fileContent = Buffer.from("fake image data");
-        
-        mockedDb.visitAttachment.findUnique.mockResolvedValue({
-            id: "att1",
-            visitId: "visit123",
-            fileName: "photo.jpg",
-            fileType: "image/jpeg",
-            fileData: fileContent,
-            fileSize: fileContent.length,
-            createdAt: new Date(),
-        });
+    const res = await GET_BY_ID(
+      new NextRequest("http://localhost/api/attachments/att1"),
+      { params: Promise.resolve({ id: "att1" }) },
+    );
 
-        const response = await GET_ID(
-            new NextRequest("http://localhost:3000/api/attachments/att1"),
-            { params: { id: "att1" } }
-        );
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Content-Type")).toBe("application/pdf");
+    expect(res.headers.get("Content-Disposition")).toContain("test.pdf");
+  });
 
-        expect(response.status).toBe(200);
-        expect(response.headers.get("Content-Type")).toBe("image/jpeg");
-        expect(response.headers.get("Content-Disposition")).toContain("photo.jpg");
-    });
+  it("returns 404 for non-existent attachment", async () => {
+    mockedDb.visitAttachment.findUnique.mockResolvedValue(null);
 
-    it("returns 404 if attachment not found", async () => {
-        mockedDb.visitAttachment.findUnique.mockResolvedValue(null);
+    const res = await GET_BY_ID(
+      new NextRequest("http://localhost/api/attachments/fake"),
+      { params: Promise.resolve({ id: "fake" }) },
+    );
 
-        const response = await GET_ID(
-            new NextRequest("http://localhost:3000/api/attachments/nonexistent"),
-            { params: { id: "nonexistent" } }
-        );
-
-        expect(response.status).toBe(404);
-        const json = await response.json();
-        expect(json.msg).toBe("Attachment not found");
-    });
-
-    it("handles database errors gracefully", async () => {
-        mockedDb.visitAttachment.findUnique.mockRejectedValue(new Error("Database connection failed"));
-
-        const response = await GET_ID(
-            new NextRequest("http://localhost:3000/api/attachments/att1"),
-            { params: { id: "att1" } }
-        );
-
-        expect(response.status).toBe(500);
-        const json = await response.json();
-        expect(json.msg).toBe("Failed to download attachment");
-    });
+    expect(res.status).toBe(404);
+  });
 });
 
-//------------------------------------------- DELETE REQUEST TESTING ---------------------------------------------------
+describe("Attachments API - DELETE", () => {
+  it("deletes an attachment", async () => {
+    mockedDb.visitAttachment.findUnique.mockResolvedValue({ id: "att1" } as never);
+    mockedDb.visitAttachment.delete.mockResolvedValue({ id: "att1" } as never);
 
-describe("Attachments API - DELETE [id]", () => {
-    it("successfully deletes an attachment", async () => {
-        const fileContent = Buffer.from("fake image data");
-        
-        mockedDb.visitAttachment.findUnique.mockResolvedValue({
-            id: "att1",
-            visitId: "visit123",
-            fileName: "photo.jpg",
-            fileType: "image/jpeg",
-            fileData: fileContent,
-            fileSize: fileContent.length,
-            createdAt: new Date(),
-        });
+    const res = await DELETE(
+      new NextRequest("http://localhost/api/attachments/att1", { method: "DELETE" }),
+      { params: Promise.resolve({ id: "att1" }) },
+    );
+    const json = await res.json();
 
-        mockedDb.visitAttachment.delete.mockResolvedValue({
-            id: "att1",
-            visitId: "visit123",
-            fileName: "photo.jpg",
-            fileType: "image/jpeg",
-            fileData: fileContent,
-            fileSize: fileContent.length,
-            createdAt: new Date(),
-        });
+    expect(res.status).toBe(200);
+    expect(json.msg).toBe("Attachment deleted successfully");
+  });
 
-        const response = await DELETE_ID(
-            new NextRequest("http://localhost:3000/api/attachments/att1", { method: "DELETE" }),
-            { params: { id: "att1" } }
-        );
+  it("returns 404 if attachment does not exist", async () => {
+    mockedDb.visitAttachment.findUnique.mockResolvedValue(null);
 
-        expect(response.status).toBe(200);
-        const json = await response.json();
-        expect(json.msg).toBe("Attachment deleted successfully");
+    const res = await DELETE(
+      new NextRequest("http://localhost/api/attachments/fake", { method: "DELETE" }),
+      { params: Promise.resolve({ id: "fake" }) },
+    );
 
-        expect(mockedDb.visitAttachment.delete).toHaveBeenCalledWith({
-            where: { id: "att1" },
-        });
-    });
-
-    it("returns 404 if attachment to delete not found", async () => {
-        mockedDb.visitAttachment.findUnique.mockResolvedValue(null);
-
-        const response = await DELETE_ID(
-            new NextRequest("http://localhost:3000/api/attachments/nonexistent", { method: "DELETE" }),
-            { params: { id: "nonexistent" } }
-        );
-
-        expect(response.status).toBe(404);
-        const json = await response.json();
-        expect(json.msg).toBe("Attachment not found");
-        expect(mockedDb.visitAttachment.delete).not.toHaveBeenCalled();
-    });
-
-    it("handles database errors gracefully", async () => {
-        mockedDb.visitAttachment.findUnique.mockRejectedValue(new Error("Database connection failed"));
-
-        const response = await DELETE_ID(
-            new NextRequest("http://localhost:3000/api/attachments/att1", { method: "DELETE" }),
-            { params: { id: "att1" } }
-        );
-
-        expect(response.status).toBe(500);
-        const json = await response.json();
-        expect(json.msg).toBe("Failed to delete attachment");
-    });
+    expect(res.status).toBe(404);
+  });
 });

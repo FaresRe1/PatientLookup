@@ -1,34 +1,29 @@
 import { useState, useEffect } from "react";
-import type { ClientJSONType } from "~/models/client";
-
-type Client = ClientJSONType;
+import type { PatientJSON } from "~/models/patient";
 
 export function usePatients() {
-  const [clients, setClients] = useState<Client[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [patients, setPatients] = useState<PatientJSON[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Debounce the API call by 300ms to avoid spamming the server
     const timer = setTimeout(async () => {
       setIsLoading(true);
       setError(null);
 
       const url = searchTerm.trim()
-        ? `/api/clients/search?query=${encodeURIComponent(searchTerm.trim())}`
-        : "/api/clients";
+        ? `/api/patients/search?query=${encodeURIComponent(searchTerm.trim())}`
+        : "/api/patients";
 
       try {
         const res = await fetch(url);
         if (!res.ok) throw new Error("Failed to load patients.");
-
         const data = await res.json();
-        const clientList = searchTerm.trim() ? data : data.clients;
-        setClients(clientList || []);
-      } catch (err: any) {
-        setError(err.message);
-        setClients([]);
+        setPatients(data ?? []);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+        setPatients([]);
       } finally {
         setIsLoading(false);
       }
@@ -37,11 +32,5 @@ export function usePatients() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  return {
-    clients,
-    searchTerm,
-    setSearchTerm,
-    isLoading,
-    error,
-  };
+  return { patients, searchTerm, setSearchTerm, isLoading, error };
 }
