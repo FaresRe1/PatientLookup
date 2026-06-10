@@ -114,7 +114,7 @@ export default function HubPage() {
             {!stats.isEnded && (
               <Link
                 href="/add-patient"
-                className="px-3 py-1.5 bg-brand-orange hover:bg-brand-dark-orange text-white rounded-xl text-xs font-black transition-all"
+                className="px-3 py-1.5 bg-[#266AFB] hover:bg-[#003588] text-white rounded-xl text-xs font-black transition-all"
               >
                 + Register
               </Link>
@@ -129,7 +129,7 @@ export default function HubPage() {
           </span>
           <Link
             href="/clinic/sessions"
-            className="px-3 py-1.5 bg-brand-orange hover:bg-brand-dark-orange text-white rounded-xl text-xs font-black transition-all"
+            className="px-3 py-1.5 bg-[#266AFB] hover:bg-[#003588] text-white rounded-xl text-xs font-black transition-all"
           >
             Create Session
           </Link>
@@ -147,14 +147,14 @@ export default function HubPage() {
               className="relative flex flex-col gap-3 p-4 bg-white rounded-2xl border border-card-rim hover:border-session-rim shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
             >
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${clinic ? "bg-clinic-icon-bg" : "bg-util-icon-bg"}`}>
-                <Icon size={22} className={clinic ? "text-brand-orange" : "text-util-icon"} />
+                <Icon size={22} className={clinic ? "text-[#266AFB]" : "text-util-icon"} />
               </div>
               <div>
                 <p className="font-black text-gray-900 text-sm leading-tight">{label}</p>
                 <p className="text-xs text-gray-400 font-medium mt-0.5">{sub}</p>
               </div>
               {badgeCount > 0 && (
-                <span className="absolute top-3 right-3 min-w-[22px] h-[22px] px-1.5 bg-brand-orange text-white text-xs font-black rounded-full flex items-center justify-center">
+                <span className="absolute top-3 right-3 min-w-[22px] h-[22px] px-1.5 bg-[#266AFB] text-white text-xs font-black rounded-full flex items-center justify-center">
                   {badgeCount}
                 </span>
               )}
@@ -175,14 +175,14 @@ export default function HubPage() {
               <span className="text-gray-400 font-medium">{stats?.active ?? 0} active</span>
               <span className="text-gray-400 font-medium">{stats?.registeredToday ?? 0} today</span>
             </div>
-            <div className="flex items-center gap-2 text-brand-orange font-black">
+            <div className="flex items-center gap-2 text-[#266AFB] font-black">
               <TrendingUp size={15} />
               {progress}%
             </div>
           </div>
           <div className="w-full bg-progress-rail rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-brand-orange to-brand-dark-orange h-2 rounded-full transition-all duration-500"
+              className="bg-[#266AFB] h-2 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>

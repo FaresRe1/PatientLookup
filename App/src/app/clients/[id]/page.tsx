@@ -122,13 +122,13 @@ export default function ClientDetails() {
         }
     };
 
-    if (isLoading) return <div className="flex justify-center p-20"><Activity className="animate-spin text-brand-orange" size={48} /></div>;
+    if (isLoading) return <div className="flex justify-center p-20"><Activity className="animate-spin text-[#266AFB]" size={48} /></div>;
 
     return (
         <div className="max-w-6xl mx-auto space-y-10 pb-20 animate-in fade-in duration-500">
             {/* Top Navigation Bar */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <Link href="/" className="flex items-center gap-2 text-brand-orange font-bold hover:underline">
+                <Link href="/" className="flex items-center gap-2 text-[#266AFB] font-bold hover:underline">
                     <ArrowLeft size={20} strokeWidth={3} />
                     Back to Patient List
                 </Link>
@@ -136,7 +136,7 @@ export default function ClientDetails() {
                     <button 
                         onClick={() => isEditing ? handleSaveAction() : setIsEditing(true)}
                         disabled={isSaving}
-                        className="flex items-center gap-2 bg-white border-2 border-brand-orange text-brand-orange px-5 py-2.5 rounded-xl font-bold hover:bg-orange-50 transition-all shadow-sm"
+                        className="flex items-center gap-2 bg-white border-2 border-[#266AFB] text-[#266AFB] px-5 py-2.5 rounded-xl font-bold hover:bg-[#EBF1FF] transition-all shadow-sm"
                     >
                         {isSaving ? <Loader2 className="animate-spin" size={18} /> : (isEditing ? <Save size={18} /> : <Edit3 size={18} />)}
                         {isSaving ? "Saving..." : (isEditing ? "Save Changes" : "Edit Profile")}
@@ -157,7 +157,7 @@ export default function ClientDetails() {
                             {isEditing ? (
                                 <label className="cursor-pointer">
                                     <input type="file" className="hidden" onChange={(e) => setNewProfileImage(e.target.files?.[0] || null)} />
-                                    <div className="w-44 h-44 bg-gray-50 rounded-3xl border-2 border-dashed border-brand-orange/30 flex flex-col items-center justify-center text-brand-orange">
+                                    <div className="w-44 h-44 bg-gray-50 rounded-3xl border-2 border-dashed border-[#266AFB]/30 flex flex-col items-center justify-center text-[#266AFB]">
                                         <Camera size={32} />
                                         <span className="text-xs font-black mt-2 uppercase tracking-tighter">Change Photo</span>
                                     </div>
@@ -167,12 +167,12 @@ export default function ClientDetails() {
                                     {client?.profileImage ? (
                                         <img src={`data:image/jpeg;base64,${client.profileImage}`} className="w-full h-full object-cover" alt="Profile" />
                                     ) : (
-                                        <div className="w-full h-full bg-orange-100 flex items-center justify-center"><User size={64} className="text-brand-orange" /></div>
+                                        <div className="w-full h-full bg-[#EBF1FF] flex items-center justify-center"><User size={64} className="text-[#266AFB]" /></div>
                                     )}
                                 </div>
                             )}
                         </div>
-                        <span className="bg-orange-100 text-brand-dark-orange text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest">ID: #{client?.id}</span>
+                        <span className="bg-[#D6E4FF] text-[#003588] text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest">ID: #{client?.id}</span>
                     </div>
 
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
@@ -196,7 +196,7 @@ export default function ClientDetails() {
             <div className="space-y-6 pt-6">
                 <div className="flex justify-between items-center">
                     <h2 className="text-2xl font-black text-gray-800 flex items-center gap-3">
-                        <ClipboardList className="text-brand-orange" size={28} />
+                        <ClipboardList className="text-[#266AFB]" size={28} />
                         Medical Visit History
                     </h2>
                     {!isEditing && (
@@ -215,7 +215,7 @@ export default function ClientDetails() {
                                 {/* Visit Card Header */}
                                 <div className="flex flex-col md:flex-row justify-between mb-8 pb-8 border-b border-gray-50 gap-6">
                                     <div className="flex items-center gap-5">
-                                        <div className="bg-orange-50 p-4 rounded-2xl text-brand-orange shadow-sm"><Calendar size={28} /></div>
+                                        <div className="bg-[#EBF1FF] p-4 rounded-2xl text-[#266AFB] shadow-sm"><Calendar size={28} /></div>
                                         <div>
                                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Visit Date</p>
                                             <p className="text-xl font-bold text-gray-800">{new Date(visit.visitDate).toLocaleDateString()}</p>
@@ -244,7 +244,7 @@ export default function ClientDetails() {
                                         <div className="flex flex-wrap gap-4">
                                             {visit.attachments.map((att) => (
                                                 <div key={att.id} className="flex items-center gap-4 bg-gray-50 border border-gray-100 p-3.5 rounded-2xl">
-                                                    <FileText size={20} className="text-brand-orange" />
+                                                    <FileText size={20} className="text-[#266AFB]" />
                                                     <div>
                                                         <p className="text-sm font-bold text-gray-700 leading-none">{att.fileName}</p>
                                                         <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold">{formatFileSize(att.fileSize)}</p>
@@ -253,7 +253,7 @@ export default function ClientDetails() {
                                                         {att.fileType.startsWith("image/") && (
                                                             <button 
                                                                 onClick={() => handleViewImage(att.id, att.fileName)} 
-                                                                className="p-2.5 bg-white rounded-xl text-brand-orange hover:bg-orange-100 shadow-sm transition-all"
+                                                                className="p-2.5 bg-white rounded-xl text-[#266AFB] hover:bg-[#EBF1FF] shadow-sm transition-all"
                                                                 title="View Image"
                                                             >
                                                                 <Eye size={18}/>
@@ -281,7 +281,7 @@ export default function ClientDetails() {
             {/* Original Functionality: Image Modal */}
             {selectedImage && (
                 <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-6 sm:p-20 animate-in fade-in duration-300" onClick={() => setSelectedImage(null)}>
-                    <button className="absolute top-10 right-10 text-white hover:text-brand-orange transition-colors"><X size={48}/></button>
+                    <button className="absolute top-10 right-10 text-white hover:text-[#266AFB] transition-colors"><X size={48}/></button>
                     <div className="bg-white p-2 rounded-3xl shadow-2xl max-w-full max-h-full overflow-hidden" onClick={e => e.stopPropagation()}>
                         <img 
                             src={URL.createObjectURL(selectedImage.data)} 
@@ -304,12 +304,12 @@ function DetailItem({ label, name, value, editValue, isEditing, onChange, type =
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{label}</p>
             {isEditing ? (
                 type === "select" ? (
-                    <select value={editValue || ""} onChange={(e) => onChange((prev: any) => ({ ...prev, [name]: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-4 focus:ring-orange-100 outline-none transition-all font-semibold">
+                    <select value={editValue || ""} onChange={(e) => onChange((prev: any) => ({ ...prev, [name]: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-semibold">
                         <option value="">Select...</option>
                         {options.map((o: string) => <option key={o} value={o}>{o}</option>)}
                     </select>
                 ) : (
-                    <input type={type} value={type === "date" && editValue ? new Date(editValue).toISOString().split('T')[0] : (editValue || "")} onChange={(e) => onChange((prev: any) => ({ ...prev, [name]: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-4 focus:ring-orange-100 outline-none transition-all font-semibold" />
+                    <input type={type} value={type === "date" && editValue ? new Date(editValue).toISOString().split('T')[0] : (editValue || "")} onChange={(e) => onChange((prev: any) => ({ ...prev, [name]: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-semibold" />
                 )
             ) : (
                 <p className="text-lg font-bold text-gray-800 leading-tight">{value || "—"}</p>
@@ -320,10 +320,10 @@ function DetailItem({ label, name, value, editValue, isEditing, onChange, type =
 
 function HistoryItem({ label, name, value, editValue, isEditing, onChange }: any) {
     return (
-        <div className="bg-orange-50/40 p-8 rounded-[2rem] border border-orange-100/60">
-            <p className="text-[10px] font-black text-brand-dark-orange uppercase tracking-[0.2em] mb-4">{label}</p>
+        <div className="bg-[#EBF1FF]/40 p-8 rounded-[2rem] border border-[#D6E4FF]/60">
+            <p className="text-[10px] font-black text-[#003588] uppercase tracking-[0.2em] mb-4">{label}</p>
             {isEditing ? (
-                <textarea value={editValue || ""} onChange={(e) => onChange((prev: any) => ({ ...prev, [name]: e.target.value }))} className="w-full bg-white border border-orange-200 p-4 rounded-2xl focus:ring-4 focus:ring-orange-100 outline-none min-h-[140px] font-medium" />
+                <textarea value={editValue || ""} onChange={(e) => onChange((prev: any) => ({ ...prev, [name]: e.target.value }))} className="w-full bg-white border border-[#D6E4FF] p-4 rounded-2xl focus:ring-4 focus:ring-blue-100 outline-none min-h-[140px] font-medium" />
             ) : (
                 <p className="text-gray-700 leading-relaxed font-semibold">{value || "No records provided."}</p>
             )}

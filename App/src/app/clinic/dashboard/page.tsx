@@ -186,7 +186,7 @@ export default function DashboardPage() {
         </div>
         <Link
           href="/clinic/sessions"
-          className="px-6 py-3 bg-brand-orange hover:bg-brand-dark-orange text-white rounded-2xl font-black transition-colors"
+          className="px-6 py-3 bg-[#266AFB] hover:bg-[#003588] text-white rounded-2xl font-black transition-colors"
         >
           Manage Sessions
         </Link>
@@ -257,15 +257,15 @@ export default function DashboardPage() {
           <h1 className="text-4xl font-black text-white leading-tight truncate">{session.clinicName}</h1>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-2 text-base text-gray-400 font-medium">
             <span className="flex items-center gap-2">
-              <MapPin size={16} className="text-brand-orange" />
+              <MapPin size={16} className="text-[#266AFB]" />
               {session.location}
             </span>
             <span className="flex items-center gap-2">
-              <Clock size={16} className="text-brand-orange" />
+              <Clock size={16} className="text-[#266AFB]" />
               {sessionDate} &bull; {startStr}–{endStr}
             </span>
             <span className="flex items-center gap-2">
-              <Target size={16} className="text-brand-orange" />
+              <Target size={16} className="text-[#266AFB]" />
               Target: {session.dailyTarget} patients
             </span>
           </div>
@@ -330,7 +330,7 @@ export default function DashboardPage() {
             label="Medication"
             waiting={stats.waitingMeds}
             active={0}
-            dotColor="bg-orange-500"
+            dotColor="bg-[#266AFB]"
           />
         </div>
       </div>
@@ -382,7 +382,7 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-sm text-gray-400 font-medium">
-                <TrendingUp size={15} className="text-brand-orange" />
+                <TrendingUp size={15} className="text-[#266AFB]" />
                 Avg / hour
               </span>
               <span className="text-xl font-black text-white tabular-nums">{pph}</span>

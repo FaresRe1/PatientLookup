@@ -80,8 +80,8 @@ const STAGE_GROUPS: {
   {
     label: "Awaiting Medication",
     statuses: ["waiting_medication"],
-    color: "bg-orange-50 border-orange-200",
-    dot: "bg-brand-orange",
+    color: "bg-[#EBF1FF] border-[#D6E4FF]",
+    dot: "bg-[#266AFB]",
   },
   {
     label: "Completed",
@@ -133,8 +133,8 @@ function PatientCard({ encounter }: { encounter: EncounterRow }) {
           className="w-10 h-10 rounded-lg object-cover shrink-0 border border-gray-100"
         />
       ) : (
-        <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center shrink-0">
-          <span className="text-brand-orange font-black text-xs">
+        <div className="w-10 h-10 rounded-lg bg-[#EBF1FF] flex items-center justify-center shrink-0">
+          <span className="text-[#266AFB] font-black text-xs">
             {getInitials(client.fullName)}
           </span>
         </div>
@@ -165,7 +165,7 @@ function PatientCard({ encounter }: { encounter: EncounterRow }) {
     return (
       <Link
         href={href}
-        className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:border-brand-orange/30 hover:shadow-sm transition-all"
+        className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:border-[#266AFB]/30 hover:shadow-sm transition-all"
       >
         {inner}
       </Link>
@@ -275,7 +275,7 @@ export default function ClinicPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[40vh]">
-        <RefreshCw className="animate-spin text-brand-orange" size={32} />
+        <RefreshCw className="animate-spin text-[#266AFB]" size={32} />
       </div>
     );
   }
@@ -283,8 +283,8 @@ export default function ClinicPage() {
   if (!session) {
     return (
       <div className="max-w-xl mx-auto text-center space-y-6 py-20 animate-in fade-in duration-500">
-        <div className="w-20 h-20 bg-orange-100 rounded-3xl flex items-center justify-center mx-auto">
-          <Stethoscope size={40} className="text-brand-orange" />
+        <div className="w-20 h-20 bg-[#EBF1FF] rounded-3xl flex items-center justify-center mx-auto">
+          <Stethoscope size={40} className="text-[#266AFB]" />
         </div>
         <div>
           <h2 className="text-2xl font-black text-gray-900">No Active Session</h2>
@@ -294,7 +294,7 @@ export default function ClinicPage() {
         </div>
         <Link
           href="/clinic/sessions"
-          className="inline-flex items-center gap-2 bg-brand-orange hover:bg-brand-dark-orange text-white px-6 py-3 rounded-2xl font-black shadow-lg shadow-orange-500/20 transition-all"
+          className="inline-flex items-center gap-2 bg-[#266AFB] hover:bg-[#003588] text-white px-6 py-3 rounded-2xl font-black shadow-lg shadow-blue-500/20 transition-all"
         >
           <Settings size={18} />
           Manage Sessions
@@ -309,20 +309,20 @@ export default function ClinicPage() {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl font-black text-gray-900 flex items-center gap-3">
-            <Stethoscope className="text-brand-orange" size={28} />
+            <Stethoscope className="text-[#266AFB]" size={28} />
             {session.clinicName}
           </h2>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-sm text-gray-500 font-medium">
             <span className="flex items-center gap-1.5">
-              <MapPin size={14} className="text-brand-orange" />
+              <MapPin size={14} className="text-[#266AFB]" />
               {session.location}
             </span>
             <span className="flex items-center gap-1.5">
-              <Calendar size={14} className="text-brand-orange" />
+              <Calendar size={14} className="text-[#266AFB]" />
               {sessionDate}
             </span>
             <span className="flex items-center gap-1.5">
-              <Clock size={14} className="text-brand-orange" />
+              <Clock size={14} className="text-[#266AFB]" />
               {sessionStart} – {sessionEnd}
             </span>
           </div>
@@ -340,7 +340,7 @@ export default function ClinicPage() {
           </button>
           <Link
             href="/add-patient"
-            className="flex items-center gap-2 bg-brand-orange hover:bg-brand-dark-orange text-white px-4 py-2.5 rounded-xl font-black text-sm shadow-md shadow-orange-500/20 transition-all"
+            className="flex items-center gap-2 bg-[#266AFB] hover:bg-[#003588] text-white px-4 py-2.5 rounded-xl font-black text-sm shadow-md shadow-blue-500/20 transition-all"
           >
             <UserPlus size={16} />
             Register Patient

@@ -20,12 +20,12 @@ export default function AddClientPage() {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
     const startNewVisit = submitter?.getAttribute("data-start-visit") === "true";
 
     const formData = new FormData(e.currentTarget);
-    
+
     const result = await savePatient(formData);
 
     if (result.success) {
@@ -41,9 +41,9 @@ export default function AddClientPage() {
     <div className="max-w-4xl mx-auto space-y-6 pb-20 animate-in fade-in duration-500">
       {/* Header Navigation */}
       <div className="flex items-center justify-between">
-        <Link 
-          href="/" 
-          className="flex items-center gap-2 text-brand-orange hover:text-brand-dark-orange font-bold transition-colors"
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-[#266AFB] hover:text-[#003588] font-bold transition-colors"
         >
           <ArrowLeft size={20} strokeWidth={3} />
           Back to List
@@ -52,9 +52,9 @@ export default function AddClientPage() {
 
       {/* Main Form Container */}
       <div className="bg-white rounded-3xl shadow-clean border border-gray-100 overflow-hidden">
-        <div className="p-8 border-b border-gray-50 bg-orange-50/30">
+        <div className="p-8 border-b border-gray-50 bg-[#EBF1FF]/30">
           <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
-            <User className="text-brand-orange" size={28} />
+            <User className="text-[#266AFB]" size={28} />
             Add New Patient
           </h2>
           <p className="text-gray-500 mt-1 font-medium">Please provide the initial medical and personal details below.</p>
@@ -102,10 +102,10 @@ export default function AddClientPage() {
           {/* Medical History Section */}
           <div className="space-y-6 pt-6 border-t border-gray-50">
             <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-              <ClipboardList size={16} className="text-brand-orange" />
+              <ClipboardList size={16} className="text-[#266AFB]" />
               Required Medical History
             </h3>
-            
+
             <FormGroup label="Dh - Drug History *">
               <textarea name="drugHistory" rows={3} required placeholder="List current medications and allergies..." className="form-input-styled py-3" />
             </FormGroup>
@@ -130,19 +130,19 @@ export default function AddClientPage() {
                 onChange={handleFileChange}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
-              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-10 text-center bg-gray-50 group-hover:bg-orange-50 group-hover:border-brand-orange/30 transition-all flex flex-col items-center justify-center min-h-[200px] overflow-hidden">
+              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-10 text-center bg-gray-50 group-hover:bg-[#EBF1FF] group-hover:border-[#266AFB]/30 transition-all flex flex-col items-center justify-center min-h-[200px] overflow-hidden">
                 {previewUrl ? (
                   <div className="animate-in zoom-in duration-300">
-                    <img 
-                      src={previewUrl} 
-                      alt="Preview" 
-                      className="h-32 w-32 object-cover rounded-2xl shadow-md border-2 border-white mb-2" 
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="h-32 w-32 object-cover rounded-2xl shadow-md border-2 border-white mb-2"
                     />
-                    <p className="text-brand-orange font-bold text-xs uppercase tracking-widest">Click to change photo</p>
+                    <p className="text-[#266AFB] font-bold text-xs uppercase tracking-widest">Click to change photo</p>
                   </div>
                 ) : (
                   <>
-                    <Upload className="mx-auto text-brand-orange mb-2" size={32} />
+                    <Upload className="mx-auto text-[#266AFB] mb-2" size={32} />
                     <p className="text-gray-800 font-bold">Click to upload photo</p>
                     <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest font-bold">Max size 5MB</p>
                   </>
@@ -156,7 +156,7 @@ export default function AddClientPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 bg-brand-orange hover:bg-brand-dark-orange text-white py-4 rounded-2xl font-black shadow-lg shadow-orange-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 bg-[#266AFB] hover:bg-[#003588] text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isLoading && <Loader2 className="animate-spin" size={20} />}
               {isLoading ? "SAVING..." : "ADD PATIENT"}

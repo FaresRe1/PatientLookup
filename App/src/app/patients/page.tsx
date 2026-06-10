@@ -12,7 +12,7 @@ export default function PatientsPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="flex items-center gap-2 text-brand-orange hover:text-brand-dark-orange font-bold transition-colors text-sm"
+            className="flex items-center gap-2 text-[#266AFB] hover:text-[#003588] font-bold transition-colors text-sm"
           >
             <ArrowLeft size={16} />
             Hub
@@ -24,7 +24,7 @@ export default function PatientsPage() {
         </div>
         <Link
           href="/add-patient"
-          className="flex items-center gap-2 bg-brand-orange hover:bg-brand-dark-orange text-white px-6 py-2.5 rounded-xl transition-all shadow-md active:scale-95 font-bold text-sm"
+          className="flex items-center gap-2 bg-[#266AFB] hover:bg-[#003588] text-white px-6 py-2.5 rounded-xl transition-all shadow-md active:scale-95 font-bold text-sm"
         >
           <Plus size={18} strokeWidth={3} />
           Add Patient
@@ -33,7 +33,7 @@ export default function PatientsPage() {
 
       <div className="relative group">
         <Search
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-orange transition-colors"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#266AFB] transition-colors"
           size={22}
         />
         <input
@@ -41,18 +41,18 @@ export default function PatientsPage() {
           placeholder="Search by name or phone..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-12 pr-4 py-4 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-orange-100 bg-white shadow-sm text-lg transition-all"
+          className="w-full pl-12 pr-4 py-4 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 bg-white shadow-sm text-lg transition-all"
         />
         {isLoading && (
           <div className="absolute right-4 top-1/2 -translate-y-1/2">
-            <Loader2 className="animate-spin text-brand-orange" size={20} />
+            <Loader2 className="animate-spin text-[#266AFB]" size={20} />
           </div>
         )}
       </div>
 
       <div className="bg-white rounded-3xl shadow-clean border border-gray-100 overflow-hidden">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-orange-50/50 border-b border-orange-100">
+          <thead className="bg-[#EBF1FF]/50 border-b border-[#D6E4FF]">
             <tr>
               <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest">Patient Name</th>
               <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest">Phone</th>
@@ -62,7 +62,7 @@ export default function PatientsPage() {
           <tbody className="divide-y divide-gray-50">
             {patients.length > 0 ? (
               patients.map((patient) => (
-                <tr key={patient.id} className="hover:bg-brand-cream/50 transition-colors group">
+                <tr key={patient.id} className="hover:bg-[#F5F8FF]/50 transition-colors group">
                   <td className="px-8 py-6">
                     <span className="text-gray-900 font-bold text-lg">{patient.fullName}</span>
                   </td>
@@ -73,7 +73,7 @@ export default function PatientsPage() {
                     <div className="flex justify-center">
                       <Link
                         href={`/patients/${patient.id}`}
-                        className="p-3 text-brand-orange hover:bg-orange-100 rounded-xl transition-all"
+                        className="p-3 text-[#266AFB] hover:bg-[#EBF1FF] rounded-xl transition-all"
                       >
                         <User size={22} />
                       </Link>

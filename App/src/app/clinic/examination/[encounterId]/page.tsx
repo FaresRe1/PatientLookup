@@ -175,7 +175,7 @@ export default function ExaminationFormPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[40vh]">
-        <Loader2 className="animate-spin text-brand-orange" size={32} />
+        <Loader2 className="animate-spin text-[#266AFB]" size={32} />
       </div>
     );
   }
@@ -184,7 +184,7 @@ export default function ExaminationFormPage() {
     return (
       <div className="text-center py-20">
         <p className="font-black text-gray-500">Encounter not found.</p>
-        <Link href="/clinic/examination" className="text-brand-orange font-bold underline text-sm mt-2 inline-block">
+        <Link href="/clinic/examination" className="text-[#266AFB] font-bold underline text-sm mt-2 inline-block">
           Back to Queue
         </Link>
       </div>
@@ -199,7 +199,7 @@ export default function ExaminationFormPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/clinic/examination"
-          className="flex items-center gap-2 text-brand-orange hover:text-brand-dark-orange font-bold transition-colors"
+          className="flex items-center gap-2 text-[#266AFB] hover:text-[#003588] font-bold transition-colors"
         >
           <ArrowLeft size={20} strokeWidth={3} />
           Examination Queue
@@ -218,8 +218,8 @@ export default function ExaminationFormPage() {
               className="w-20 h-20 rounded-2xl object-cover border-2 border-gray-100 shadow shrink-0"
             />
           ) : (
-            <div className="w-20 h-20 rounded-2xl bg-orange-100 flex items-center justify-center shrink-0">
-              <span className="text-brand-orange font-black text-xl">{getInitials(client.fullName)}</span>
+            <div className="w-20 h-20 rounded-2xl bg-[#EBF1FF] flex items-center justify-center shrink-0">
+              <span className="text-[#266AFB] font-black text-xl">{getInitials(client.fullName)}</span>
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -256,7 +256,7 @@ export default function ExaminationFormPage() {
       {/* ── TRIAGE SUMMARY ── */}
       <section className="space-y-4">
         <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-          <ClipboardList size={14} className="text-brand-orange" />
+          <ClipboardList size={14} className="text-[#266AFB]" />
           Triage Summary
         </h3>
 
@@ -328,7 +328,7 @@ export default function ExaminationFormPage() {
       {/* ── EXAMINATION FORM ── */}
       <section className="space-y-4">
         <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-          <Microscope size={14} className="text-brand-orange" />
+          <Microscope size={14} className="text-[#266AFB]" />
           Examination
         </h3>
 
@@ -391,7 +391,7 @@ export default function ExaminationFormPage() {
               type="button"
               onClick={handleComplete}
               disabled={saving || completing}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-brand-orange hover:bg-brand-dark-orange text-white rounded-2xl font-black shadow-lg shadow-orange-500/20 disabled:opacity-50 transition-all active:scale-95"
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#266AFB] hover:bg-[#003588] text-white rounded-2xl font-black shadow-lg shadow-blue-500/20 disabled:opacity-50 transition-all active:scale-95"
             >
               {completing ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
               {completing ? "Completing…" : "Complete Examination →"}
@@ -409,7 +409,7 @@ export default function ExaminationFormPage() {
           </Link>
           <Link
             href="/clinic"
-            className="flex items-center gap-2 px-5 py-3 bg-brand-orange hover:bg-brand-dark-orange text-white rounded-2xl font-black text-sm shadow-md shadow-orange-500/20 transition-all"
+            className="flex items-center gap-2 px-5 py-3 bg-[#266AFB] hover:bg-[#003588] text-white rounded-2xl font-black text-sm shadow-md shadow-blue-500/20 transition-all"
           >
             View Full Queue
           </Link>

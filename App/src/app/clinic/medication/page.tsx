@@ -70,11 +70,11 @@ function MedicationCard({ encounter, onGiven }: { encounter: EncounterRow; onGiv
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-orange-100 overflow-hidden shadow-clean">
+    <div className="bg-white rounded-2xl border border-[#D6E4FF] overflow-hidden shadow-clean">
       {/* Patient header */}
       <Link
         href={`/clinic/medication/${encounter.id}`}
-        className="flex items-center gap-4 p-4 hover:bg-orange-50/40 transition-colors group"
+        className="flex items-center gap-4 p-4 hover:bg-[#EBF1FF]/40 transition-colors group"
       >
         {client.profileImage ? (
           <img
@@ -83,14 +83,14 @@ function MedicationCard({ encounter, onGiven }: { encounter: EncounterRow; onGiv
             className="w-14 h-14 rounded-xl object-cover shrink-0 border-2 border-white shadow"
           />
         ) : (
-          <div className="w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
-            <span className="text-brand-orange font-black text-base">{getInitials(client.fullName)}</span>
+          <div className="w-14 h-14 rounded-xl bg-[#EBF1FF] flex items-center justify-center shrink-0">
+            <span className="text-[#266AFB] font-black text-base">{getInitials(client.fullName)}</span>
           </div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="font-black text-gray-900 text-base">{client.fullName}</p>
-            <span className="text-xs font-black text-orange-700 bg-orange-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+            <span className="text-xs font-black text-[#003588] bg-[#D6E4FF] px-2 py-0.5 rounded-full flex items-center gap-1">
               <Pill size={10} />
               Awaiting Meds
             </span>
@@ -117,11 +117,11 @@ function MedicationCard({ encounter, onGiven }: { encounter: EncounterRow; onGiv
             )}
           </div>
         </div>
-        <ChevronRight size={18} className="text-gray-300 group-hover:text-brand-orange transition-colors shrink-0" />
+        <ChevronRight size={18} className="text-gray-300 group-hover:text-[#266AFB] transition-colors shrink-0" />
       </Link>
 
       {/* Prescription panel */}
-      <div className="border-t border-orange-100 px-4 py-3 space-y-2 bg-orange-50/30">
+      <div className="border-t border-[#D6E4FF] px-4 py-3 space-y-2 bg-[#EBF1FF]/30">
         {encounter.diagnosis && (
           <div>
             <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-0.5">Diagnosis</p>
@@ -132,7 +132,7 @@ function MedicationCard({ encounter, onGiven }: { encounter: EncounterRow; onGiv
         {encounter.prescription ? (
           <div>
             <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-0.5">Prescription</p>
-            <pre className="text-sm text-gray-800 font-mono whitespace-pre-wrap leading-relaxed bg-white rounded-xl border border-orange-100 px-3 py-2">
+            <pre className="text-sm text-gray-800 font-mono whitespace-pre-wrap leading-relaxed bg-white rounded-xl border border-[#D6E4FF] px-3 py-2">
               {encounter.prescription}
             </pre>
           </div>
@@ -159,7 +159,7 @@ function MedicationCard({ encounter, onGiven }: { encounter: EncounterRow; onGiv
       </div>
 
       {/* Action */}
-      <div className="px-4 py-3 border-t border-orange-100 flex justify-end">
+      <div className="px-4 py-3 border-t border-[#D6E4FF] flex justify-end">
         <button
           onClick={handleGiven}
           disabled={dispensing}
@@ -204,7 +204,7 @@ export default function MedicationQueuePage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-20 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-brand-orange hover:text-brand-dark-orange font-bold transition-colors">
+        <Link href="/" className="flex items-center gap-2 text-[#266AFB] hover:text-[#003588] font-bold transition-colors">
           <ArrowLeft size={20} strokeWidth={3} />
           Hub
         </Link>
@@ -214,8 +214,8 @@ export default function MedicationQueuePage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-          <Pill size={20} className="text-brand-orange" />
+        <div className="w-10 h-10 bg-[#EBF1FF] rounded-xl flex items-center justify-center">
+          <Pill size={20} className="text-[#266AFB]" />
         </div>
         <div>
           <h2 className="text-2xl font-black text-gray-900">Medication Queue</h2>
@@ -227,7 +227,7 @@ export default function MedicationQueuePage() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <RefreshCw className="animate-spin text-brand-orange" size={28} />
+          <RefreshCw className="animate-spin text-[#266AFB]" size={28} />
         </div>
       ) : !sessionId ? (
         <div className="text-center py-16 bg-white rounded-3xl border border-gray-100">
@@ -243,8 +243,8 @@ export default function MedicationQueuePage() {
         </div>
       ) : (
         <div className="space-y-4">
-          <h3 className="text-xs font-black text-orange-600 uppercase tracking-[0.15em] flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-brand-orange animate-pulse" />
+          <h3 className="text-xs font-black text-[#266AFB] uppercase tracking-[0.15em] flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#266AFB] animate-pulse" />
             Awaiting Medication ({encounters.length})
           </h3>
           {encounters.map((e) => (

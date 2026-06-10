@@ -85,7 +85,7 @@ const STATUS_DISPLAY: Record<string, { label: string; color: string }> = {
   in_examination:            { label: "In Examination",       color: "bg-indigo-100 text-indigo-700" },
   examination_completed:     { label: "Exam Complete",        color: "bg-pink-100 text-pink-700" },
   in_diagnosis:              { label: "In Diagnosis",         color: "bg-rose-100 text-rose-700" },
-  waiting_medication:        { label: "Awaiting Medication",  color: "bg-orange-100 text-orange-700" },
+  waiting_medication:        { label: "Awaiting Medication",  color: "bg-[#D6E4FF] text-[#003588]" },
   completed_medication_given:{ label: "Completed",            color: "bg-emerald-100 text-emerald-700" },
   completed_no_meds:         { label: "Completed — No Meds",  color: "bg-emerald-100 text-emerald-700" },
   referred:                  { label: "Referred",             color: "bg-purple-100 text-purple-700" },
@@ -108,8 +108,8 @@ function EncounterCard({ encounter }: { encounter: ClinicEncounterRecord }) {
         onClick={() => setExpanded((v) => !v)}
         className="w-full text-left p-6 flex flex-col sm:flex-row sm:items-center gap-4"
       >
-        <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center shrink-0">
-          <Stethoscope size={22} className="text-brand-orange" />
+        <div className="w-12 h-12 bg-[#EBF1FF] rounded-2xl flex items-center justify-center shrink-0">
+          <Stethoscope size={22} className="text-[#266AFB]" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -141,7 +141,7 @@ function EncounterCard({ encounter }: { encounter: ClinicEncounterRecord }) {
           {hasTriageData && (
             <div className="p-6 space-y-4">
               <h4 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                <Thermometer size={13} className="text-brand-orange" />
+                <Thermometer size={13} className="text-[#266AFB]" />
                 Triage
               </h4>
               {encounter.mainComplaint && (
@@ -203,7 +203,7 @@ function EncounterCard({ encounter }: { encounter: ClinicEncounterRecord }) {
           {hasExamData && (
             <div className="p-6 space-y-4">
               <h4 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                <Microscope size={13} className="text-brand-orange" />
+                <Microscope size={13} className="text-[#266AFB]" />
                 Examination
               </h4>
               {encounter.examinationPerformed && (
@@ -225,7 +225,7 @@ function EncounterCard({ encounter }: { encounter: ClinicEncounterRecord }) {
           {hasDiagnosisData && (
             <div className="p-6 space-y-4">
               <h4 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                <Pill size={13} className="text-brand-orange" />
+                <Pill size={13} className="text-[#266AFB]" />
                 Diagnosis &amp; Prescription
               </h4>
               {encounter.diagnosis && (
@@ -243,7 +243,7 @@ function EncounterCard({ encounter }: { encounter: ClinicEncounterRecord }) {
               {encounter.prescription && (
                 <div>
                   <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Prescription</p>
-                  <pre className="text-sm font-mono text-gray-800 bg-orange-50/60 rounded-xl border border-orange-100 px-4 py-3 whitespace-pre-wrap leading-relaxed">
+                  <pre className="text-sm font-mono text-gray-800 bg-[#EBF1FF]/60 rounded-xl border border-[#D6E4FF] px-4 py-3 whitespace-pre-wrap leading-relaxed">
                     {encounter.prescription}
                   </pre>
                 </div>
@@ -376,7 +376,7 @@ export default function PatientDetailPage() {
   if (isLoading) {
     return (
       <div className="flex justify-center p-20">
-        <Activity className="animate-spin text-brand-orange" size={48} />
+        <Activity className="animate-spin text-[#266AFB]" size={48} />
       </div>
     );
   }
@@ -387,7 +387,7 @@ export default function PatientDetailPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <Link
           href="/"
-          className="flex items-center gap-2 text-brand-orange font-bold hover:underline"
+          className="flex items-center gap-2 text-[#266AFB] font-bold hover:underline"
         >
           <ArrowLeft size={20} strokeWidth={3} />
           Back to Patient List
@@ -398,7 +398,7 @@ export default function PatientDetailPage() {
               isEditing ? handleSaveAction() : setIsEditing(true)
             }
             disabled={isSaving}
-            className="flex items-center gap-2 bg-white border-2 border-brand-orange text-brand-orange px-5 py-2.5 rounded-xl font-bold hover:bg-orange-50 transition-all shadow-sm"
+            className="flex items-center gap-2 bg-white border-2 border-[#266AFB] text-[#266AFB] px-5 py-2.5 rounded-xl font-bold hover:bg-[#EBF1FF] transition-all shadow-sm"
           >
             {isSaving ? (
               <Loader2 className="animate-spin" size={18} />
@@ -441,7 +441,7 @@ export default function PatientDetailPage() {
                       setNewProfileImage(e.target.files?.[0] || null)
                     }
                   />
-                  <div className="w-44 h-44 bg-gray-50 rounded-3xl border-2 border-dashed border-brand-orange/30 flex flex-col items-center justify-center text-brand-orange">
+                  <div className="w-44 h-44 bg-gray-50 rounded-3xl border-2 border-dashed border-[#266AFB]/30 flex flex-col items-center justify-center text-[#266AFB]">
                     <Camera size={32} />
                     <span className="text-xs font-black mt-2 uppercase tracking-tighter">
                       Change Photo
@@ -457,14 +457,14 @@ export default function PatientDetailPage() {
                       alt="Profile"
                     />
                   ) : (
-                    <div className="w-full h-full bg-orange-100 flex items-center justify-center">
-                      <User size={64} className="text-brand-orange" />
+                    <div className="w-full h-full bg-[#EBF1FF] flex items-center justify-center">
+                      <User size={64} className="text-[#266AFB]" />
                     </div>
                   )}
                 </div>
               )}
             </div>
-            <span className="bg-orange-100 text-brand-dark-orange text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
+            <span className="bg-[#D6E4FF] text-[#003588] text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
               ID: #{patient?.id}
             </span>
           </div>
@@ -518,7 +518,7 @@ export default function PatientDetailPage() {
       <div className="space-y-6 pt-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-black text-gray-800 flex items-center gap-3">
-            <ClipboardList className="text-brand-orange" size={28} />
+            <ClipboardList className="text-[#266AFB]" size={28} />
             Medical Visit History
           </h2>
           {!isEditing && (
@@ -545,7 +545,7 @@ export default function PatientDetailPage() {
                 {/* Visit Header */}
                 <div className="flex flex-col md:flex-row justify-between mb-8 pb-8 border-b border-gray-50 gap-6">
                   <div className="flex items-center gap-5">
-                    <div className="bg-orange-50 p-4 rounded-2xl text-brand-orange shadow-sm">
+                    <div className="bg-[#EBF1FF] p-4 rounded-2xl text-[#266AFB] shadow-sm">
                       <Calendar size={28} />
                     </div>
                     <div>
@@ -603,7 +603,7 @@ export default function PatientDetailPage() {
                         >
                           <FileText
                             size={20}
-                            className="text-brand-orange"
+                            className="text-[#266AFB]"
                           />
                           <div>
                             <p className="text-sm font-bold text-gray-700 leading-none">
@@ -619,7 +619,7 @@ export default function PatientDetailPage() {
                                 onClick={() =>
                                   handleViewImage(att.id, att.fileName)
                                 }
-                                className="p-2.5 bg-white rounded-xl text-brand-orange hover:bg-orange-100 shadow-sm transition-all"
+                                className="p-2.5 bg-white rounded-xl text-[#266AFB] hover:bg-[#EBF1FF] shadow-sm transition-all"
                                 title="View Image"
                               >
                                 <Eye size={18} />
@@ -650,7 +650,7 @@ export default function PatientDetailPage() {
       {encounters.length > 0 && (
         <div className="space-y-6 pt-6">
           <h2 className="text-2xl font-black text-gray-800 flex items-center gap-3">
-            <Stethoscope className="text-brand-orange" size={28} />
+            <Stethoscope className="text-[#266AFB]" size={28} />
             Clinic Visit History
           </h2>
           <div className="grid gap-4">
@@ -667,7 +667,7 @@ export default function PatientDetailPage() {
           className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-6 sm:p-20 animate-in fade-in duration-300"
           onClick={() => setSelectedImage(null)}
         >
-          <button className="absolute top-10 right-10 text-white hover:text-brand-orange transition-colors">
+          <button className="absolute top-10 right-10 text-white hover:text-[#266AFB] transition-colors">
             <X size={48} />
           </button>
           <div

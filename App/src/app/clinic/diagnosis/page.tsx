@@ -56,7 +56,7 @@ function DiagnosisCard({ encounter }: { encounter: EncounterRow }) {
     <Link
       href={`/clinic/diagnosis/${encounter.id}`}
       className={`flex items-center gap-4 p-4 bg-white rounded-2xl border transition-all hover:shadow-md hover:-translate-y-0.5 group ${
-        isActive ? "border-rose-200 bg-rose-50/30" : "border-gray-100 hover:border-brand-orange/30"
+        isActive ? "border-rose-200 bg-rose-50/30" : "border-gray-100 hover:border-[#266AFB]/30"
       }`}
     >
       {client.profileImage ? (
@@ -66,8 +66,8 @@ function DiagnosisCard({ encounter }: { encounter: EncounterRow }) {
           className="w-14 h-14 rounded-xl object-cover shrink-0 border-2 border-white shadow"
         />
       ) : (
-        <div className="w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
-          <span className="text-brand-orange font-black text-base">{getInitials(client.fullName)}</span>
+        <div className="w-14 h-14 rounded-xl bg-[#EBF1FF] flex items-center justify-center shrink-0">
+          <span className="text-[#266AFB] font-black text-base">{getInitials(client.fullName)}</span>
         </div>
       )}
 
@@ -113,7 +113,7 @@ function DiagnosisCard({ encounter }: { encounter: EncounterRow }) {
         </div>
       </div>
 
-      <ChevronRight size={20} className="text-gray-300 group-hover:text-brand-orange transition-colors shrink-0" />
+      <ChevronRight size={20} className="text-gray-300 group-hover:text-[#266AFB] transition-colors shrink-0" />
     </Link>
   );
 }
@@ -151,7 +151,7 @@ export default function DiagnosisQueuePage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-20 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-brand-orange hover:text-brand-dark-orange font-bold transition-colors">
+        <Link href="/" className="flex items-center gap-2 text-[#266AFB] hover:text-[#003588] font-bold transition-colors">
           <ArrowLeft size={20} strokeWidth={3} />
           Hub
         </Link>
@@ -173,7 +173,7 @@ export default function DiagnosisQueuePage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16"><RefreshCw className="animate-spin text-brand-orange" size={28} /></div>
+        <div className="flex justify-center py-16"><RefreshCw className="animate-spin text-[#266AFB]" size={28} /></div>
       ) : !sessionId ? (
         <div className="text-center py-16 bg-white rounded-3xl border border-gray-100">
           <p className="font-black text-gray-500">No active session</p>

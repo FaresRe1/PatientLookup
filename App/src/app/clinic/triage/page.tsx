@@ -63,7 +63,7 @@ function TriagePatientCard({ encounter }: { encounter: EncounterRow }) {
       className={`flex items-center gap-4 p-4 bg-white rounded-2xl border transition-all hover:shadow-md hover:-translate-y-0.5 group ${
         isInProgress
           ? "border-amber-200 bg-amber-50/30"
-          : "border-gray-100 hover:border-brand-orange/30"
+          : "border-gray-100 hover:border-[#266AFB]/30"
       }`}
     >
       {client.profileImage ? (
@@ -73,8 +73,8 @@ function TriagePatientCard({ encounter }: { encounter: EncounterRow }) {
           className="w-14 h-14 rounded-xl object-cover shrink-0 border-2 border-white shadow"
         />
       ) : (
-        <div className="w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
-          <span className="text-brand-orange font-black text-base">
+        <div className="w-14 h-14 rounded-xl bg-[#EBF1FF] flex items-center justify-center shrink-0">
+          <span className="text-[#266AFB] font-black text-base">
             {getInitials(client.fullName)}
           </span>
         </div>
@@ -109,7 +109,7 @@ function TriagePatientCard({ encounter }: { encounter: EncounterRow }) {
 
       <ChevronRight
         size={20}
-        className="text-gray-300 group-hover:text-brand-orange transition-colors shrink-0"
+        className="text-gray-300 group-hover:text-[#266AFB] transition-colors shrink-0"
       />
     </Link>
   );
@@ -155,7 +155,7 @@ export default function TriageQueuePage() {
       <div className="flex items-center justify-between">
         <Link
           href="/"
-          className="flex items-center gap-2 text-brand-orange hover:text-brand-dark-orange font-bold transition-colors"
+          className="flex items-center gap-2 text-[#266AFB] hover:text-[#003588] font-bold transition-colors"
         >
           <ArrowLeft size={20} strokeWidth={3} />
           Hub
@@ -182,14 +182,14 @@ export default function TriageQueuePage() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <RefreshCw className="animate-spin text-brand-orange" size={28} />
+          <RefreshCw className="animate-spin text-[#266AFB]" size={28} />
         </div>
       ) : !sessionId ? (
         <div className="text-center py-16 bg-white rounded-3xl border border-gray-100">
           <p className="font-black text-gray-500">No active session</p>
           <Link
             href="/clinic/sessions"
-            className="text-brand-orange font-bold text-sm underline mt-2 inline-block"
+            className="text-[#266AFB] font-bold text-sm underline mt-2 inline-block"
           >
             Start a session →
           </Link>

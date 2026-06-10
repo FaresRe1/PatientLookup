@@ -1,0 +1,8 @@
+{
+  "name": "Project Ziriya",
+  "short_name": "Ziriya",
+  "theme_color": "#003588",
+  "background_color": "#F5F8FF",
+  "display": "standalone",
+  "start_url": "/"
+}

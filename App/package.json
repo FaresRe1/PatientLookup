@@ -1,8 +1,8 @@
 {
-  "name": "patient-lookup",
+  "name": "ziriya-clinic",
   "version": "0.1.0",
   "private": true,
-  "description": "Patient record and clinic management web application built with Next.js + Prisma",
+  "description": "Project Ziriya Global Med — Pop-up clinic patient management system",
   "author": "",
   "type": "module",
   "scripts": {
@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.17.1",
+    "@t3-oss/env-nextjs": "^0.13.11",
     "lucide-react": "^0.563.0",
     "next": "14.2.15",
     "react": "^18.2.0",

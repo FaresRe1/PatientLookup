@@ -270,7 +270,7 @@ export default function DiagnosisFormPage() {
 
   const completeBtnClass = () => {
     if (form.referral) return "bg-purple-600 hover:bg-purple-700 shadow-purple-500/20";
-    if (form.medicationNeeded) return "bg-brand-orange hover:bg-brand-dark-orange shadow-orange-500/20";
+    if (form.medicationNeeded) return "bg-[#266AFB] hover:bg-[#003588] shadow-blue-500/20";
     return "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20";
   };
 
@@ -279,7 +279,7 @@ export default function DiagnosisFormPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[40vh]">
-        <Loader2 className="animate-spin text-brand-orange" size={32} />
+        <Loader2 className="animate-spin text-[#266AFB]" size={32} />
       </div>
     );
   }
@@ -288,7 +288,7 @@ export default function DiagnosisFormPage() {
     return (
       <div className="text-center py-20">
         <p className="font-black text-gray-500">Encounter not found.</p>
-        <Link href="/clinic/diagnosis" className="text-brand-orange font-bold underline text-sm mt-2 inline-block">
+        <Link href="/clinic/diagnosis" className="text-[#266AFB] font-bold underline text-sm mt-2 inline-block">
           Back to Queue
         </Link>
       </div>
@@ -301,7 +301,7 @@ export default function DiagnosisFormPage() {
     <div className="max-w-3xl mx-auto space-y-6 pb-24 animate-in fade-in duration-500">
       {/* Nav */}
       <div className="flex items-center gap-3">
-        <Link href="/clinic/diagnosis" className="flex items-center gap-2 text-brand-orange hover:text-brand-dark-orange font-bold transition-colors">
+        <Link href="/clinic/diagnosis" className="flex items-center gap-2 text-[#266AFB] hover:text-[#003588] font-bold transition-colors">
           <ArrowLeft size={20} strokeWidth={3} />
           Diagnosis Queue
         </Link>
@@ -316,8 +316,8 @@ export default function DiagnosisFormPage() {
             <img src={`data:image/jpeg;base64,${client.profileImage}`} alt={client.fullName}
               className="w-20 h-20 rounded-2xl object-cover border-2 border-gray-100 shadow shrink-0" />
           ) : (
-            <div className="w-20 h-20 rounded-2xl bg-orange-100 flex items-center justify-center shrink-0">
-              <span className="text-brand-orange font-black text-xl">{getInitials(client.fullName)}</span>
+            <div className="w-20 h-20 rounded-2xl bg-[#EBF1FF] flex items-center justify-center shrink-0">
+              <span className="text-[#266AFB] font-black text-xl">{getInitials(client.fullName)}</span>
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -352,7 +352,7 @@ export default function DiagnosisFormPage() {
       {/* ── CLINICAL SUMMARY ── */}
       <section className="space-y-3">
         <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-          <ClipboardList size={14} className="text-brand-orange" />
+          <ClipboardList size={14} className="text-[#266AFB]" />
           Clinical Summary
         </h3>
 
@@ -421,7 +421,7 @@ export default function DiagnosisFormPage() {
       {/* ── DIAGNOSIS FORM ── */}
       <section className="space-y-4">
         <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-          <FileText size={14} className="text-brand-orange" />
+          <FileText size={14} className="text-[#266AFB]" />
           Diagnosis &amp; Treatment
         </h3>
 
@@ -472,7 +472,7 @@ export default function DiagnosisFormPage() {
       {/* ── PRESCRIPTION ── */}
       <section className="space-y-4">
         <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-          <Pill size={14} className="text-brand-orange" />
+          <Pill size={14} className="text-[#266AFB]" />
           Prescription
         </h3>
         <div className="bg-white rounded-3xl border border-gray-100 shadow-clean p-6 space-y-6">
@@ -502,7 +502,7 @@ export default function DiagnosisFormPage() {
       {/* ── DISPOSITION ── */}
       <section className="space-y-4">
         <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-          <CheckCircle2 size={14} className="text-brand-orange" />
+          <CheckCircle2 size={14} className="text-[#266AFB]" />
           Disposition
         </h3>
         <div className="space-y-3">
@@ -511,7 +511,7 @@ export default function DiagnosisFormPage() {
             description="Patient requires medication from the pharmacy team"
             checked={form.medicationNeeded}
             onChange={(v) => setField("medicationNeeded", v)}
-            activeColor="border-brand-orange bg-orange-50 text-brand-dark-orange"
+            activeColor="border-[#266AFB] bg-[#EBF1FF] text-[#003588]"
             disabled={isReadOnly || form.referral}
           />
           <Toggle
@@ -598,7 +598,7 @@ export default function DiagnosisFormPage() {
             <ArrowLeft size={16} />
             Back to Queue
           </Link>
-          <Link href="/clinic" className="flex items-center gap-2 px-5 py-3 bg-brand-orange hover:bg-brand-dark-orange text-white rounded-2xl font-black text-sm shadow-md shadow-orange-500/20 transition-all">
+          <Link href="/clinic" className="flex items-center gap-2 px-5 py-3 bg-[#266AFB] hover:bg-[#003588] text-white rounded-2xl font-black text-sm shadow-md shadow-blue-500/20 transition-all">
             View Full Queue
           </Link>
         </div>

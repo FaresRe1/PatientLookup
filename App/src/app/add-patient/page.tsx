@@ -112,7 +112,7 @@ export default function AddPatientPage() {
       <div className="flex items-center justify-between">
         <Link
           href={activeSession ? "/clinic" : "/"}
-          className="flex items-center gap-2 text-brand-orange hover:text-brand-dark-orange font-bold transition-colors"
+          className="flex items-center gap-2 text-[#266AFB] hover:text-[#003588] font-bold transition-colors"
         >
           <ArrowLeft size={20} strokeWidth={3} />
           {activeSession ? "Back to Clinic" : "Back to List"}
@@ -150,9 +150,9 @@ export default function AddPatientPage() {
       )}
 
       <div className="bg-white rounded-3xl shadow-clean border border-gray-100 overflow-hidden">
-        <div className="p-8 border-b border-gray-50 bg-orange-50/30">
+        <div className="p-8 border-b border-gray-50 bg-[#EBF1FF]/30">
           <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
-            <User className="text-brand-orange" size={28} />
+            <User className="text-[#266AFB]" size={28} />
             {activeSession ? "Register New Patient" : "Add New Patient"}
           </h2>
           <p className="text-gray-500 mt-1 font-medium">
@@ -260,7 +260,7 @@ export default function AddPatientPage() {
               onClick={() => {
                 submitModeRef.current = activeSession ? "clinic" : "plain";
               }}
-              className="w-full bg-brand-orange hover:bg-brand-dark-orange text-white py-4 rounded-2xl font-black shadow-lg shadow-orange-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-[#266AFB] hover:bg-[#003588] text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isLoading && <Loader2 className="animate-spin" size={20} />}
               {isLoading

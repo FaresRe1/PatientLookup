@@ -123,14 +123,14 @@ export default function SessionsPage() {
       <div className="flex items-center justify-between">
         <Link
           href="/clinic"
-          className="flex items-center gap-2 text-brand-orange hover:text-brand-dark-orange font-bold transition-colors"
+          className="flex items-center gap-2 text-[#266AFB] hover:text-[#003588] font-bold transition-colors"
         >
           <ArrowLeft size={20} strokeWidth={3} />
           Back to Clinic
         </Link>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="flex items-center gap-2 bg-brand-orange hover:bg-brand-dark-orange text-white px-4 py-2.5 rounded-xl font-black text-sm shadow-md shadow-orange-500/20 transition-all"
+          className="flex items-center gap-2 bg-[#266AFB] hover:bg-[#003588] text-white px-4 py-2.5 rounded-xl font-black text-sm shadow-md shadow-blue-500/20 transition-all"
         >
           <Plus size={16} />
           New Session
@@ -138,14 +138,14 @@ export default function SessionsPage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Stethoscope size={24} className="text-brand-orange" />
+        <Stethoscope size={24} className="text-[#266AFB]" />
         <h2 className="text-2xl font-black text-gray-900">Clinic Sessions</h2>
       </div>
 
       {/* Create form */}
       {showForm && (
         <div className="bg-white rounded-3xl shadow-clean border border-gray-100 overflow-hidden animate-in slide-in-from-top-3 duration-300">
-          <div className="p-6 border-b border-gray-50 bg-orange-50/30">
+          <div className="p-6 border-b border-gray-50 bg-[#EBF1FF]/30">
             <h3 className="font-black text-gray-900 text-lg">New Clinic Session</h3>
           </div>
           <form onSubmit={handleCreate} className="p-6 space-y-6">
@@ -216,7 +216,7 @@ export default function SessionsPage() {
                 type="checkbox"
                 name="isActive"
                 defaultChecked
-                className="w-5 h-5 rounded accent-brand-orange"
+                className="w-5 h-5 rounded accent-[#266AFB]"
               />
               <span className="font-bold text-gray-700 text-sm">
                 Set as active session immediately
@@ -226,7 +226,7 @@ export default function SessionsPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex-1 bg-brand-orange hover:bg-brand-dark-orange text-white py-3 rounded-2xl font-black disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
+                className="flex-1 bg-[#266AFB] hover:bg-[#003588] text-white py-3 rounded-2xl font-black disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
               >
                 {saving && <Loader2 size={18} className="animate-spin" />}
                 {saving ? "Creating…" : "Create Session"}
@@ -246,7 +246,7 @@ export default function SessionsPage() {
       {/* Session list */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Loader2 className="animate-spin text-brand-orange" size={32} />
+          <Loader2 className="animate-spin text-[#266AFB]" size={32} />
         </div>
       ) : sessions.length === 0 ? (
         <div className="text-center py-16 text-gray-400 bg-white rounded-3xl border border-gray-100">

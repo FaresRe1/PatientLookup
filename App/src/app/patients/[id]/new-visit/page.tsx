@@ -141,7 +141,7 @@ export default function NewVisitPage() {
   if (isLoading) {
     return (
       <div className="flex justify-center p-20">
-        <Activity className="animate-spin text-brand-orange" size={48} />
+        <Activity className="animate-spin text-[#266AFB]" size={48} />
       </div>
     );
   }
@@ -160,13 +160,13 @@ export default function NewVisitPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <Link
           href={`/patients/${id}`}
-          className="flex items-center gap-2 text-brand-orange font-bold hover:underline"
+          className="flex items-center gap-2 text-[#266AFB] font-bold hover:underline"
         >
           <ArrowLeft size={20} strokeWidth={3} />
           Back to Profile
         </Link>
-        <div className="bg-white px-6 py-3 rounded-2xl shadow-sm border border-orange-100 flex items-center gap-4">
-          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-brand-orange">
+        <div className="bg-white px-6 py-3 rounded-2xl shadow-sm border border-[#D6E4FF] flex items-center gap-4">
+          <div className="w-10 h-10 bg-[#EBF1FF] rounded-full flex items-center justify-center text-[#266AFB]">
             <User size={20} />
           </div>
           <div>
@@ -188,7 +188,7 @@ export default function NewVisitPage() {
           {/* Visit Info */}
           <div className="bg-white rounded-3xl shadow-clean border border-gray-100 p-8 space-y-6">
             <h2 className="text-xl font-black text-gray-800 flex items-center gap-3">
-              <Calendar className="text-brand-orange" />
+              <Calendar className="text-[#266AFB]" />
               Visit Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -200,7 +200,7 @@ export default function NewVisitPage() {
                   type="date"
                   value={form.visitDate}
                   onChange={(e) => updateField("visitDate")(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-100 p-3 rounded-xl focus:ring-4 focus:ring-orange-100 outline-none font-semibold transition-all"
+                  className="w-full bg-gray-50 border border-gray-100 p-3 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-semibold transition-all"
                 />
               </div>
               <div className="space-y-2">
@@ -220,7 +220,7 @@ export default function NewVisitPage() {
                     onChange={(e) =>
                       updateField("doctorName")(e.target.value)
                     }
-                    className="w-full bg-gray-50 border border-gray-100 pl-10 pr-4 py-3 rounded-xl focus:ring-4 focus:ring-orange-100 outline-none font-semibold transition-all"
+                    className="w-full bg-gray-50 border border-gray-100 pl-10 pr-4 py-3 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-semibold transition-all"
                   />
                 </div>
               </div>
@@ -230,7 +230,7 @@ export default function NewVisitPage() {
           {/* Clinical Documentation */}
           <div className="bg-white rounded-3xl shadow-clean border border-gray-100 p-8 space-y-8">
             <h2 className="text-xl font-black text-gray-800 flex items-center gap-3">
-              <ClipboardCheck className="text-brand-orange" />
+              <ClipboardCheck className="text-[#266AFB]" />
               Clinical Documentation
             </h2>
 
@@ -294,7 +294,7 @@ export default function NewVisitPage() {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="w-full bg-brand-orange hover:bg-brand-dark-orange text-white py-4 rounded-2xl font-black shadow-lg shadow-orange-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
+                className="w-full bg-[#266AFB] hover:bg-[#003588] text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
               >
                 {isSaving ? (
                   <Loader2 className="animate-spin" />
@@ -323,15 +323,15 @@ export default function NewVisitPage() {
                 </h3>
                 {isUploadingFile && (
                   <Loader2
-                    className="animate-spin text-brand-orange"
+                    className="animate-spin text-[#266AFB]"
                     size={16}
                   />
                 )}
               </div>
 
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50 hover:bg-orange-50 hover:border-brand-orange/30 transition-all cursor-pointer group">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50 hover:bg-[#EBF1FF] hover:border-[#266AFB]/30 transition-all cursor-pointer group">
                 <Upload
-                  className="text-gray-400 group-hover:text-brand-orange mb-2"
+                  className="text-gray-400 group-hover:text-[#266AFB] mb-2"
                   size={24}
                 />
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-tighter">
@@ -357,7 +357,7 @@ export default function NewVisitPage() {
                     <div className="flex items-center gap-2 overflow-hidden">
                       <FileText
                         size={16}
-                        className="text-brand-orange flex-shrink-0"
+                        className="text-[#266AFB] flex-shrink-0"
                       />
                       <span className="text-xs font-bold text-gray-700 truncate">
                         {att.fileName}

@@ -26,7 +26,7 @@ const EXPORTS: { type: ExportType; label: string; sub: string; icon: React.React
     label: "Clinic Encounters",
     sub: "Full clinical data — triage, exam, diagnosis, prescription",
     icon: <Stethoscope size={22} />,
-    color: "text-brand-orange",
+    color: "text-[#266AFB]",
   },
   {
     type: "sessions",
@@ -99,11 +99,11 @@ export default function ExportPage() {
         {/* Header */}
         <div className="text-center space-y-2">
           <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mx-auto transition-colors ${
-            unlocked ? "bg-emerald-100" : "bg-orange-100"
+            unlocked ? "bg-emerald-100" : "bg-[#EBF1FF]"
           }`}>
             {unlocked
               ? <Unlock size={32} className="text-emerald-600" />
-              : <Lock size={32} className="text-brand-orange" />
+              : <Lock size={32} className="text-[#266AFB]" />
             }
           </div>
           <h1 className="text-2xl font-black text-gray-900">Data Export</h1>
@@ -136,7 +136,7 @@ export default function ExportPage() {
             <button
               type="submit"
               disabled={checking || !password}
-              className="w-full bg-brand-orange hover:bg-brand-dark-orange text-white py-3.5 rounded-2xl font-black disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95"
+              className="w-full bg-[#266AFB] hover:bg-[#003588] text-white py-3.5 rounded-2xl font-black disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95"
             >
               {checking && <Loader2 size={18} className="animate-spin" />}
               {checking ? "Checking…" : "Unlock"}
@@ -152,7 +152,7 @@ export default function ExportPage() {
                 key={type}
                 onClick={() => handleDownload(type, type)}
                 disabled={downloading === type}
-                className="w-full flex items-center gap-4 p-4 bg-gray-50 hover:bg-orange-50/60 border border-gray-100 hover:border-orange-200 rounded-2xl transition-all disabled:opacity-60 text-left group"
+                className="w-full flex items-center gap-4 p-4 bg-gray-50 hover:bg-[#EBF1FF]/60 border border-gray-100 hover:border-[#D6E4FF] rounded-2xl transition-all disabled:opacity-60 text-left group"
               >
                 <div className={`w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center shrink-0 shadow-sm ${color}`}>
                   {icon}
@@ -163,11 +163,11 @@ export default function ExportPage() {
                 </div>
                 <div className="shrink-0">
                   {downloading === type ? (
-                    <Loader2 size={18} className="animate-spin text-brand-orange" />
+                    <Loader2 size={18} className="animate-spin text-[#266AFB]" />
                   ) : done === type ? (
                     <CheckCircle2 size={18} className="text-emerald-500" />
                   ) : (
-                    <Download size={18} className="text-gray-400 group-hover:text-brand-orange transition-colors" />
+                    <Download size={18} className="text-gray-400 group-hover:text-[#266AFB] transition-colors" />
                   )}
                 </div>
               </button>
