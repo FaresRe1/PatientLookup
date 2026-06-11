@@ -3,6 +3,8 @@ import { db } from "~/server/db";
 import { errorResponse } from "~/lib/api";
 import type { EncounterStatus } from "~/lib/encounterStatus";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     let isEnded = false;
@@ -24,6 +26,8 @@ export async function GET() {
       where: { createdAt: { gte: todayStart }, deletedAt: null },
     });
 
+    const noStore = { headers: { "Cache-Control": "no-store" } };
+
     if (!session) {
       return NextResponse.json({
         session: null,
@@ -39,7 +43,7 @@ export async function GET() {
         waitingDiagnosis: 0,
         inDiagnosis: 0,
         waitingMeds: 0,
-      });
+      }, noStore);
     }
 
     const rows = await db.clinicEncounter.groupBy({
@@ -80,7 +84,7 @@ export async function GET() {
       waitingDiagnosis: get("examination_completed"),
       inDiagnosis: get("in_diagnosis"),
       waitingMeds: get("waiting_medication"),
-    });
+    }, noStore);
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     return errorResponse("Failed to retrieve hub stats", 500, msg);

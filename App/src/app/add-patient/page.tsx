@@ -30,7 +30,7 @@ export default function AddPatientPage() {
   const [sessionLoading, setSessionLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/clinic-sessions/active")
+    fetch("/api/clinic-sessions/active", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => setActiveSession(data))
       .catch(() => setActiveSession(null))

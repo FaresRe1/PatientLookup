@@ -65,7 +65,7 @@ export default function HubPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/hub/stats")
+    fetch("/api/hub/stats", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() as Promise<HubStats> : Promise.resolve(null)))
       .then((data) => setStats(data))
       .catch(() => setStats(null))

@@ -4,6 +4,8 @@ import { errorResponse } from "~/lib/api";
 import { COMPLETED_STATUSES } from "~/lib/encounterStatus";
 import type { EncounterStatus } from "~/lib/encounterStatus";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     let isEnded = false;
@@ -67,7 +69,7 @@ export async function GET() {
       waitingDiagnosis: get("examination_completed"),
       inDiagnosis: get("in_diagnosis"),
       waitingMeds: get("waiting_medication"),
-    });
+    }, { headers: { "Cache-Control": "no-store" } });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     return errorResponse("Failed to retrieve session stats", 500, msg);
