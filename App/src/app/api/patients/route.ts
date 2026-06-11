@@ -38,6 +38,8 @@ export async function POST(req: Request) {
       profileImage = new Uint8Array(arrayBuffer);
     }
 
+    const sessionId = (formData.get("sessionId") as string) || null;
+
     const data = {
       fullName: formData.get("fullName") as string,
       gender: formData.get("gender") as string,
@@ -55,7 +57,16 @@ export async function POST(req: Request) {
       );
     }
 
-    const newRecord = await db.client.create({ data: result.data });
+    const newRecord = await db.$transaction(async (tx) => {
+      const client = await tx.client.create({ data: result.data });
+      if (sessionId) {
+        await tx.clinicEncounter.create({
+          data: { clientId: client.id, sessionId, status: "registered" },
+        });
+      }
+      return client;
+    });
+
     return NextResponse.json(serializePatient(newRecord));
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Unknown error";

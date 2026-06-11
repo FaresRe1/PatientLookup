@@ -25,7 +25,7 @@ export default function AddPatientPage() {
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const capturedFileRef = useRef<File | null>(null);
-  const submitModeRef = useRef<"clinic" | "visit" | "plain">("plain");
+  const visitModeRef = useRef(false);
   const [activeSession, setActiveSession] = useState<ClinicSessionResponseType | null>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
 
@@ -59,7 +59,7 @@ export default function AddPatientPage() {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const mode = submitModeRef.current;
+    const isVisitMode = visitModeRef.current;
     const formData = new FormData(e.currentTarget);
 
     if (capturedFileRef.current) {
@@ -67,17 +67,15 @@ export default function AddPatientPage() {
       formData.append("profileImage", capturedFileRef.current, "camera-capture.jpg");
     }
 
+    // Attach sessionId so the API creates the encounter atomically
+    if (activeSession && !isVisitMode) {
+      formData.append("sessionId", activeSession.id);
+    }
+
     const result = await savePatient(formData);
     if (!result.success) return;
 
-    if (mode === "clinic" && activeSession) {
-      await fetch("/api/encounters", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clientId: result.id, sessionId: activeSession.id }),
-      });
-      router.push("/clinic");
-    } else if (mode === "visit") {
+    if (isVisitMode) {
       router.push(`/patients/${result.id}/new-visit`);
     } else {
       router.push("/");
@@ -257,9 +255,7 @@ export default function AddPatientPage() {
             <button
               type="submit"
               disabled={isLoading}
-              onClick={() => {
-                submitModeRef.current = activeSession ? "clinic" : "plain";
-              }}
+              onClick={() => { visitModeRef.current = false; }}
               className="w-full bg-[#266AFB] hover:bg-[#003588] text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isLoading && <Loader2 className="animate-spin" size={20} />}
@@ -274,7 +270,7 @@ export default function AddPatientPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                onClick={() => { submitModeRef.current = "visit"; }}
+                onClick={() => { visitModeRef.current = true; }}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50"
               >
                 ADD &amp; START VISIT
